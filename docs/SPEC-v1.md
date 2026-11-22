@@ -123,6 +123,17 @@ Le réglage dit « I/Us » côté joueur. Dans le jeu, aucun libellé politique.
 - **Panneau de courbes**, repliable : population, inégalités de revenu et de patrimoine, stock de l'étang, contribution moyenne, traits moyens et répartition des dispositions.
 - **Lignée du joueur** : un repère discret permet de suivre son villageois puis ses descendants.
 
+## Une vie à pied (proposition à l'essai)
+
+La fiche [0020](decisions/0020-une-vie-puis-l-histoire.md) propose de remplacer l'observateur par une vie jouée. Elle est à l'essai sur la page `jeu/`, à côté du village regardé : l'accueil propose « Vivre une vie » ou « Régler un village et le regarder » (décision [0030](decisions/0030-une-vie-a-pied.md)).
+
+- Le joueur commence à 15 ans chez un parent, se déplace au clavier ou au clic dans le village vu de dessus, parle aux villageois, porte sa récolte au grenier et pêche à l'étang. Le geste fixe sa décision ; le moteur calcule le résultat.
+- Les maisons sont posées dans l'ordre de l'anneau du moteur : les voisins que chacun observe sont les maisons d'à côté.
+- Cinq chapitres (15, 25, 35, 45, 55 ans) ; entre deux, le temps file et seules des cartes l'arrêtent. À la mort, une chronique de ce qui reste.
+- Le rythme (durée d'une saison à pied, nombre de lancers, chapitres) est affiché dans l'aide du jeu.
+
+Si 0020 est acceptée, ce chapitre remplacera le parcours, l'intro et l'écran de simulation ci-dessus.
+
 ## Fin de partie
 
 La partie se termine quand le village s'éteint, quand la durée choisie est atteinte, ou quand le joueur l'arrête.
@@ -156,10 +167,10 @@ Tous les paramètres sont visibles avec leur statut. En revanche, aucun chiffre 
 - **Stack** : TypeScript, Vite, Phaser 4 (décision [0018](decisions/0018-phaser-4.md)), Vitest.
 - **Séparation stricte** :
   - `src/sim/` contient le moteur, en TypeScript pur, sans aucun import de Phaser ni du DOM. Il est déterministe : PRNG à graine, même graine et mêmes réglages donnent exactement le même résultat. Il expose `step()` (une saison) et `run(n)` (sans rendu).
-  - `src/game/` contient le jeu, servi par la page `jeu/index.html` (décision [0019](decisions/0019-squelette-du-jeu.md)). Phaser ne dessine que le village (`src/game/scenes/`) ; le réglage, les commandes du temps, la fiche d'un villageois et les autres écrans à base de texte sont en HTML par-dessus le canevas (`src/game/ui/`), plus accessible et plus simple à traduire. La logique qui ne dessine pas (temps, plan du village, chorégraphie d'une saison) vit dans `src/game/core/`, sans Phaser ni DOM, et elle est testée. Le jeu lit l'état du moteur sans jamais le modifier ; la vitesse ne décide que du nombre de saisons calculées, jamais de leur contenu.
+  - `src/game/` contient le jeu, servi par la page `jeu/index.html` (décisions [0019](decisions/0019-squelette-du-jeu.md) et [0030](decisions/0030-une-vie-a-pied.md)). Phaser ne dessine que le village (`src/game/scenes/`) ; le réglage, les commandes du temps, la fiche d'un villageois et les autres écrans à base de texte sont en HTML par-dessus le canevas (`src/game/ui/`), plus accessible et plus simple à traduire. La logique qui ne dessine pas (temps, plan du village, chorégraphie d'une saison) vit dans `src/game/core/`, sans Phaser ni DOM, et elle est testée. Le jeu lit l'état du moteur sans jamais le modifier ; la vitesse ne décide que du nombre de saisons calculées, jamais de leur contenu.
   - `src/i18n/` contiendra `fr.json` et `en.json` pour les textes du jeu. Aucun texte en dur dans le code. Les textes qui décrivent le modèle (paramètres, règles) vivent, eux, dans les registres de `src/sim/`, déjà en français et en anglais.
   - `src/lab/` contient le labo.
-- **Graphismes** : packs pixel art libres de droits (licence vérifiée et notée dans `assets/LICENSES.md`) ou sprites originaux. Aucun élément repris d'un jeu existant.
+- **Graphismes** : packs pixel art libres de droits (licence vérifiée et notée dans `assets/LICENSES.md`) ou sprites originaux. Aucun élément repris d'un jeu existant. Pour l'instant, la vie à pied dessine ses propres formes en pixels au lancement (`src/game/scenes/art.ts`), sans image à charger.
 - **Hébergement** : GitHub Pages, déployé par une GitHub Action à chaque push sur `main`.
 
 ## Tests du moteur

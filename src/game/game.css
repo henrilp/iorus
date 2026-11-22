@@ -316,3 +316,320 @@ button[aria-pressed='true'] {
     max-height: 60%;
   }
 }
+
+/* Accueil */
+
+#home {
+  padding: 1rem;
+}
+
+.home {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.home h2 {
+  margin: 0.5rem 0 0.25rem;
+}
+
+.home-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.8rem 1.1rem 1.1rem;
+  margin: 0 0 1rem;
+}
+
+.home-card.main {
+  border-color: var(--accent);
+  border-width: 2px;
+}
+
+.home-card h3 {
+  margin: 0.2rem 0 0.4rem;
+}
+
+.home-card .field {
+  max-width: 28rem;
+}
+
+button.back {
+  margin: 0 auto 0.5rem;
+  display: block;
+  max-width: 40rem;
+  width: 100%;
+  text-align: left;
+}
+
+/* Une vie à pied (fiche 0030) */
+
+#life {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+#life-stage {
+  flex: 1;
+  position: relative;
+  background: #1d2a1a;
+  min-height: calc(100vh - 3.2rem);
+  overflow: hidden;
+}
+
+#life-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+#life-canvas canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+#life-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-size: 0.95rem;
+}
+
+#life-ui > * {
+  pointer-events: auto;
+}
+
+.life-bar {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  right: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+  background: rgb(255 250 240 / 0.92);
+  color: #2b2620;
+  border: 1px solid #d8ccb6;
+  border-radius: 8px;
+  padding: 0.35rem 0.7rem;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.25);
+}
+
+.life-info {
+  font-variant-numeric: tabular-nums;
+}
+
+.life-clock {
+  flex: 1;
+  min-width: 5rem;
+  height: 0.45rem;
+  border-radius: 1rem;
+  background: #e8dcc4;
+  overflow: hidden;
+}
+
+.life-clock > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #f0c25a, #d07a5f 85%, #3a4a7a);
+}
+
+.life-buttons {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.life-buttons button {
+  font-size: 0.85rem;
+  padding: 0.2rem 0.55rem;
+  background: #fffaf0;
+  color: #2b2620;
+  border-color: #d8ccb6;
+}
+
+.life-prompt {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 2rem);
+  background: rgb(43 38 32 / 0.85);
+  color: #fffaf0;
+  padding: 0.35rem 0.9rem;
+  border: none;
+  border-radius: 2rem;
+  text-align: center;
+  font: inherit;
+  cursor: pointer;
+}
+
+.life-panel,
+.life-card {
+  background: #fffaf0;
+  color: #2b2620;
+  border: 1px solid #d8ccb6;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.35);
+}
+
+.life-panel {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(34rem, calc(100% - 1.5rem));
+  max-height: calc(100% - 5rem);
+  overflow: auto;
+  padding: 0.6rem 1.1rem 0.9rem;
+}
+
+.life-panel h3 {
+  margin: 0.2rem 2rem 0.4rem 0;
+}
+
+.life-panel h3 small {
+  font-weight: normal;
+  color: #6b6257;
+}
+
+.life-panel p {
+  margin: 0.35rem 0;
+}
+
+.life-panel .help,
+.life-card .help {
+  color: #6b6257;
+}
+
+.life-panel fieldset {
+  background: transparent;
+  border-color: #d8ccb6;
+}
+
+.life-close {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.5rem;
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #6b6257;
+}
+
+.life-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+
+.life-stepper {
+  justify-content: center;
+}
+
+.life-stepper button {
+  min-width: 2.6rem;
+  font-size: 1.2rem;
+}
+
+.life-count {
+  font-size: 1.6rem;
+  font-weight: 700;
+  min-width: 5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.life-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.life-action {
+  margin: 0.5rem 0;
+}
+
+.life-action small {
+  display: block;
+  color: #6b6257;
+  margin-top: 0.2rem;
+}
+
+.life-panel button,
+.life-card button {
+  background: #fffaf0;
+  color: #2b2620;
+  border-color: #d8ccb6;
+}
+
+.life-panel button.primary,
+.life-card button.primary,
+.life-panel button[aria-pressed='true'] {
+  background: #8f4a37;
+  color: #fff;
+  border-color: #8f4a37;
+}
+
+.life-toast {
+  position: absolute;
+  top: 3.6rem;
+  right: 0.6rem;
+  width: min(24rem, calc(100% - 1.2rem));
+  background: rgb(43 38 32 / 0.9);
+  color: #fffaf0;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.life-toast p {
+  margin: 0.25rem 0 0;
+}
+
+.life-card-wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(20 18 14 / 0.45);
+  padding: 1rem;
+}
+
+.life-card {
+  width: min(32rem, 100%);
+  max-height: 100%;
+  overflow: auto;
+  padding: 0.8rem 1.3rem 1.1rem;
+}
+
+.life-card h2 {
+  margin: 0.2rem 0 0.5rem;
+  font-size: 1.3rem;
+}
+
+.life-speaker {
+  font-weight: 600;
+  color: #8f4a37;
+}
+
+.life-card-choices {
+  justify-content: flex-end;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  .life-bar {
+    font-size: 0.85rem;
+  }
+  .life-toast {
+    top: auto;
+    bottom: 3.5rem;
+  }
+}
