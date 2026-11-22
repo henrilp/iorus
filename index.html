@@ -31,18 +31,18 @@
             <fieldset>
               <legend>Composition de la population</legend>
               <label class="check"><input type="radio" name="mode" value="uniform" /> Tous pareils</label>
-              <label class="check"><input type="radio" name="mode" value="twoGroups" checked /> Deux groupes</label>
+              <label class="check"><input type="radio" name="mode" value="twoGroups" checked /> Deux profils de départ</label>
               <label class="check"><input type="radio" name="mode" value="mix" /> Mélange au hasard</label>
               <div data-mode="uniform">
                 <label>Disposition : I ← → Us <output name="o_d">0.5</output><input type="range" name="d" min="0" max="1" step="0.05" value="0.5" /></label>
                 <label>Influençabilité <output name="o_i">0.7</output><input type="range" name="i" min="0" max="1" step="0.05" value="0.7" /></label>
               </div>
               <div data-mode="twoGroups">
-                <label>Taille du groupe A <output name="o_shareA">0.15</output><input type="range" name="shareA" min="0" max="1" step="0.05" value="0.15" /></label>
-                <label>Groupe A : disposition I ← → Us <output name="o_dA">0</output><input type="range" name="dA" min="0" max="1" step="0.05" value="0" /></label>
-                <label>Groupe A : influençabilité <output name="o_iA">0</output><input type="range" name="iA" min="0" max="1" step="0.05" value="0" /></label>
-                <label>Groupe B : disposition I ← → Us <output name="o_dB">0.6</output><input type="range" name="dB" min="0" max="1" step="0.05" value="0.6" /></label>
-                <label>Groupe B : influençabilité <output name="o_iB">0.7</output><input type="range" name="iB" min="0" max="1" step="0.05" value="0.7" /></label>
+                <label>Part du profil 1 <output name="o_shareA">0.15</output><input type="range" name="shareA" min="0" max="1" step="0.05" value="0.15" /></label>
+                <label>Profil 1 : disposition I ← → Us <output name="o_dA">0</output><input type="range" name="dA" min="0" max="1" step="0.05" value="0" /></label>
+                <label>Profil 1 : influençabilité <output name="o_iA">0</output><input type="range" name="iA" min="0" max="1" step="0.05" value="0" /></label>
+                <label>Profil 2 : disposition I ← → Us <output name="o_dB">0.6</output><input type="range" name="dB" min="0" max="1" step="0.05" value="0.6" /></label>
+                <label>Profil 2 : influençabilité <output name="o_iB">0.7</output><input type="range" name="iB" min="0" max="1" step="0.05" value="0.7" /></label>
               </div>
               <div data-mode="mix">
                 <label>Disposition moyenne I ← → Us <output name="o_mean">0.5</output><input type="range" name="mean" min="0" max="1" step="0.05" value="0.5" /></label>
@@ -50,7 +50,7 @@
                 <label>Influençabilité moyenne <output name="o_iMean">0.7</output><input type="range" name="iMean" min="0" max="1" step="0.05" value="0.7" /></label>
                 <label>Dispersion de l’influençabilité <output name="o_iSpread">0.15</output><input type="range" name="iSpread" min="0" max="0.5" step="0.05" value="0.15" /></label>
               </div>
-              <p class="help">Deux traits par villageois. La disposition va de 0 (tout pour soi) à 1 (tout pour le groupe) : c’est ce qu’il ferait s’il ne regardait personne. L’influençabilité va de 0 (il ne regarde pas les autres) à 1 (il fait comme il croit que les autres font). Le réglage « deux groupes » par défaut met 15 % de profiteurs insensibles aux autres parmi des villageois plutôt coopératifs et influençables. L’influençabilité par défaut de 0,7 reflète l’observation que la plupart des gens sont des coopérateurs conditionnels (à sourcer).</p>
+              <p class="help">Deux traits par villageois. La disposition va de 0 (tout pour soi) à 1 (tout pour le groupe) : c’est ce qu’il ferait s’il ne regardait personne. L’influençabilité va de 0 (il ne regarde pas les autres) à 1 (il fait comme il croit que les autres font). Le réglage « deux profils de départ » par défaut met 15 % de profiteurs insensibles aux autres parmi des villageois plutôt coopératifs et influençables. Ce ne sont pas des groupes : personne ne sait à quel profil appartient l’autre, et les profils se mélangent dès la première génération ; la carte de répartition montre ce qu’ils deviennent. L’influençabilité par défaut de 0,7 reflète l’observation que la plupart des gens sont des coopérateurs conditionnels (à sourcer).</p>
             </fieldset>
             <fieldset>
               <legend>Règles du village</legend>

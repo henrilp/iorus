@@ -32,8 +32,11 @@ const SERIES: Series[] = [
   },
   {
     title: 'Inégalités (indice de Gini)',
-    explanation: 'Sur les réserves de nourriture des adultes. 0 : tout le monde a la même chose ; proche de 1 : une personne a presque tout.',
-    lines: [{ label: 'gini', color: '#a0525f', value: (m) => m.gini }],
+    explanation: '0 : tout le monde pareil ; proche de 1 : une personne a presque tout. Rouge : revenus de la saison, qui reflètent les comportements. Gris : patrimoine accumulé, qui reflète surtout l’âge et l’héritage (environ 0,6 même entre villageois identiques).',
+    lines: [
+      { label: 'revenus', color: '#a0525f', value: (m) => m.incomeGini },
+      { label: 'patrimoine', color: '--muted', value: (m) => m.wealthGini },
+    ],
     max: 1,
   },
   {
@@ -46,25 +49,73 @@ const SERIES: Series[] = [
   },
   {
     title: 'Sanctions par saison',
-    explanation: 'Nombre de villageois sanctionnés dans la saison (zéro si les sanctions sont interdites).',
-    lines: [{ label: 'sanctions', color: '#8a5fb5', value: (m) => m.sanctions }],
+    explanation: 'Violet : sanctions pour le grenier. Bleu : sanctions contre la surpêche. Zéro si elles sont interdites.',
+    lines: [
+      { label: 'grenier', color: '#8a5fb5', value: (m) => m.sanctions - m.pondSanctions },
+      { label: 'pêche', color: '#3f7fb5', value: (m) => m.pondSanctions },
+    ],
   },
 ];
 
 export function createCharts(container: HTMLElement): (history: SeasonMetrics[]) => void {
-  const canvases = SERIES.map((s) => {
-    const fig = document.createElement('figure');
-    const cap = document.createElement('figcaption');
-    cap.textContent = s.title;
-    const small = document.createElement('small');
-    small.textContent = s.explanation;
-    cap.append(small);
-    const canvas = document.createElement('canvas');
-    fig.append(cap, canvas);
-    container.append(fig);
-    return canvas;
-  });
-  return (history) => SERIES.forEach((s, i) => draw(canvases[i]!, s, history));
+  const heatmap = createFigure(
+    container,
+    'Répartition des dispositions dans le temps',
+    'Chaque colonne est un moment de la partie ; de bas en haut, les dispositions de 0 (tout pour soi) à 1 (tout pour le groupe). Plus c’est foncé, plus il y a de villageois dans cette tranche. Montre ce que la moyenne cache : convergence, village coupé en deux, invasion.',
+  );
+  heatmap.parentElement!.classList.add('wide');
+  const canvases = SERIES.map((s) => createFigure(container, s.title, s.explanation));
+  return (history) => {
+    drawHeatmap(heatmap, history);
+    SERIES.forEach((s, i) => draw(canvases[i]!, s, history));
+  };
+}
+
+function createFigure(container: HTMLElement, title: string, explanation: string): HTMLCanvasElement {
+  const fig = document.createElement('figure');
+  const cap = document.createElement('figcaption');
+  cap.textContent = title;
+  const small = document.createElement('small');
+  small.textContent = explanation;
+  cap.append(small);
+  const canvas = document.createElement('canvas');
+  fig.append(cap, canvas);
+  container.append(fig);
+  return canvas;
+}
+
+/** Carte de chaleur : temps en abscisse, tranches de disposition en ordonnée, part de la population en intensité. */
+function drawHeatmap(canvas: HTMLCanvasElement, history: SeasonMetrics[]): void {
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d')!;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+  if (history.length === 0) return;
+  const pad = { l: 22, r: 4, t: 4, b: 4 };
+  const plotW = w - pad.l - pad.r;
+  const plotH = h - pad.t - pad.b;
+  const columns = Math.max(1, Math.min(history.length, Math.floor(plotW / 3)));
+  const colW = plotW / columns;
+  const rowH = plotH / 10;
+  for (let c = 0; c < columns; c++) {
+    const from = Math.floor((c * history.length) / columns);
+    const to = Math.max(from + 1, Math.floor(((c + 1) * history.length) / columns));
+    const slice = history.slice(from, to);
+    for (let b = 0; b < 10; b++) {
+      const share = slice.reduce((a, m) => a + (m.dispositionBins[b] ?? 0), 0) / slice.length;
+      if (share <= 0) continue;
+      ctx.fillStyle = `rgba(90, 143, 90, ${Math.min(1, 0.08 + share * 2.5)})`;
+      ctx.fillRect(pad.l + c * colW, pad.t + (9 - b) * rowH, Math.ceil(colW), Math.ceil(rowH));
+    }
+  }
+  ctx.fillStyle = color('--muted');
+  ctx.font = '11px system-ui';
+  ctx.fillText('1', 6, pad.t + 10);
+  ctx.fillText('0', 6, h - pad.b - 2);
 }
 
 function color(c: string): string {

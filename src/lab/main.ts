@@ -28,7 +28,13 @@ sanctionsLabel.append(createParamInput('sanctionsEnabled'), ` ${t(PARAM_SPECS.sa
 const sanctionsHelp = document.createElement('p');
 sanctionsHelp.className = 'help';
 sanctionsHelp.textContent = t(PARAM_SPECS.sanctionsEnabled.help);
-document.querySelector('#simple-sanctions')!.append(sanctionsLabel, sanctionsHelp);
+const pondSanctionsLabel = document.createElement('label');
+pondSanctionsLabel.className = 'check';
+pondSanctionsLabel.append(createParamInput('pondSanctionsEnabled'), ` ${t(PARAM_SPECS.pondSanctionsEnabled.label)}`);
+const pondSanctionsHelp = document.createElement('p');
+pondSanctionsHelp.className = 'help';
+pondSanctionsHelp.textContent = t(PARAM_SPECS.pondSanctionsEnabled.help);
+document.querySelector('#simple-sanctions')!.append(sanctionsLabel, sanctionsHelp, pondSanctionsLabel, pondSanctionsHelp);
 
 // Réglages simples
 function num(name: string): number {

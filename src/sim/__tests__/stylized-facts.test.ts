@@ -40,10 +40,23 @@ describe('faits stylisés', () => {
     expect(endWith).toBeGreaterThan(endWithout + 0.1);
   });
 
-  test('tragédie des communs : un village d’égoïstes épuise l’étang', () => {
-    const runs = runSeeds({ size: 30, composition: { mode: 'uniform', disposition: 0.05, influence: INFLUENCE } }, 100);
-    for (const h of runs) expect(h.some((m) => m.pondDepleted)).toBe(true);
-    expect(avgOver(runs, 'pond', 90 * SEASONS_PER_YEAR, 100 * SEASONS_PER_YEAR)).toBeLessThan(0.1);
+  test('tragédie des communs : en accès libre, un village d’égoïstes surexploite l’étang', () => {
+    // Hardin (1968), Gordon (1954) : en accès libre, chacun pêche pour soi et le stock tombe
+    // sous le niveau qui donne la plus grande pêche durable (la moitié de la capacité en croissance logistique),
+    // et bien plus bas qu'avec des pêcheurs modérés. Surexploitation ne veut pas dire extinction.
+    const egoists = runSeeds({ size: 30, composition: { mode: 'uniform', disposition: 0.05, influence: INFLUENCE } }, 100);
+    const generous = runSeeds({ size: 30, composition: { mode: 'uniform', disposition: 0.9, influence: INFLUENCE } }, 100);
+    for (const h of egoists) expect(Math.min(...h.map((m) => m.pond))).toBeLessThan(0.5);
+    const range = [40 * SEASONS_PER_YEAR, 60 * SEASONS_PER_YEAR] as const;
+    expect(avgOver(egoists, 'pond', ...range)).toBeLessThan(avgOver(generous, 'pond', ...range) - 0.2);
+  });
+
+  test('sanctions de la surpêche : l’étang est mieux préservé', () => {
+    // Ostrom, Walker et Gardner (1992, à vérifier) : la possibilité de sanctionner réduit la surexploitation d'une ressource commune.
+    const without = runSeeds({ size: 30, composition: freeRiders }, 60);
+    const withSanctions = runSeeds({ size: 30, composition: freeRiders, params: { pondSanctionsEnabled: true } }, 60);
+    const range = [40 * SEASONS_PER_YEAR, 60 * SEASONS_PER_YEAR] as const;
+    expect(avgOver(withSanctions, 'pond', ...range)).toBeGreaterThan(avgOver(without, 'pond', ...range) + 0.05);
   });
 
   test('invasion : sans sanction, une minorité de profiteurs gagne la population au fil des générations', () => {

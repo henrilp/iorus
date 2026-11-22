@@ -32,8 +32,8 @@ export const RULES: Rule[] = [
     phase: 'setup',
     title: { fr: 'La population de départ', en: 'The starting population' },
     text: {
-      fr: 'Chaque villageois reçoit deux traits, selon la composition choisie (tous pareils, deux groupes, ou un mélange tiré au hasard autour d’une moyenne). Sa disposition va de 0 (tout pour soi, I) à 1 (tout pour le groupe, Us) : c’est ce qu’il ferait s’il ne regardait personne. Son influençabilité va de 0 (il ne regarde pas les autres) à 1 (il règle entièrement sa conduite sur eux). Son âge est tiré au hasard entre l’âge adulte et l’âge maximal de départ, et il reçoit la réserve de départ. Il tire aussi son âge de mort, jamais avant l’âge adulte. Hypothèse de départ : chacun croit que les autres lui ressemblent (sa croyance initiale sur les autres est égale à sa propre disposition).',
-      en: 'Each villager gets two traits, according to the chosen composition (all alike, two groups, or a random mix around an average). Their disposition goes from 0 (all for oneself, I) to 1 (all for the group, Us): what they would do if they watched nobody. Their susceptibility to influence goes from 0 (ignores others) to 1 (fully adjusts to them). Their age is drawn at random between adulthood and the maximum starting age, and they get the starting reserve. They also draw their age of death, never before adulthood. Starting assumption: everyone believes others are like them (their initial belief about others equals their own disposition).',
+      fr: 'Chaque villageois reçoit deux traits, selon la composition choisie (tous pareils, deux profils de départ, ou un mélange tiré au hasard autour d’une moyenne ; les « profils » ne sont pas des groupes : personne ne sait à quel profil appartient l’autre, et les profils se mélangent dès la première génération). Sa disposition va de 0 (tout pour soi, I) à 1 (tout pour le groupe, Us) : c’est ce qu’il ferait s’il ne regardait personne. Son influençabilité va de 0 (il ne regarde pas les autres) à 1 (il règle entièrement sa conduite sur eux). Son âge est tiré au hasard entre l’âge adulte et l’âge maximal de départ, et il reçoit la réserve de départ. Il tire aussi son âge de mort, jamais avant l’âge adulte. Hypothèse de départ : chacun croit que les autres lui ressemblent (sa croyance initiale sur les autres est égale à sa propre disposition).',
+      en: 'Each villager gets two traits, according to the chosen composition (all alike, two starting profiles, or a random mix around an average; “profiles” are not groups: nobody knows which profile anyone else belongs to, and profiles blend from the first generation). Their disposition goes from 0 (all for oneself, I) to 1 (all for the group, Us): what they would do if they watched nobody. Their susceptibility to influence goes from 0 (ignores others) to 1 (fully adjusts to them). Their age is drawn at random between adulthood and the maximum starting age, and they get the starting reserve. They also draw their age of death, never before adulthood. Starting assumption: everyone believes others are like them (their initial belief about others equals their own disposition).',
     },
     formula: 'âge ~ uniforme([adultAge], [initialMaxAge]) ; âge de mort = max([adultAge], normale([lifeExpectancy], [lifeExpectancySd])) ; croyances = disposition',
     params: ['adultAge', 'initialMaxAge', 'startingWealth', 'lifeExpectancy', 'lifeExpectancySd'],
@@ -100,24 +100,24 @@ export const RULES: Rule[] = [
     phase: 'season',
     title: { fr: '4. La pêche', en: '4. Fishing' },
     text: {
-      fr: 'Chaque adulte décide de sa modération selon la même logique que le grenier : sa disposition, ce qu’il croit de la modération des autres, et son influençabilité pour doser les deux. Il veut pêcher d’autant plus qu’il se modère peu. Si le village veut plus que ce que l’étang permet en une saison, chacun reçoit au prorata.',
-      en: 'Each adult decides how much restraint to show with the same logic as the granary: their disposition, what they believe about others’ restraint, and their susceptibility to influence to weigh the two. The less restraint, the more they want to fish. If the village wants more than the pond allows in a season, each gets a proportional share.',
+      fr: 'Chaque adulte décide de sa modération selon la même logique que le grenier : sa disposition, ce qu’il croit de la modération des autres, et son influençabilité pour doser les deux ; la peur des sanctions contre la surpêche le pousse à s’aligner. Son effort de pêche vaut 1 − modération. Sa prise est proportionnelle à son effort et au stock (modèle de Schaefer) : moins il reste de poissons, plus il faut d’effort pour en attraper un. On ne peut jamais pêcher plus que le stock.',
+      en: 'Each adult decides how much restraint to show with the same logic as the granary: their disposition, what they believe about others’ restraint, and their susceptibility to influence to weigh the two; fear of sanctions against overfishing pushes them to align. Their fishing effort is 1 − restraint. Their catch is proportional to their effort and to the stock (Schaefer model): the fewer fish remain, the more effort it takes to catch one. One can never catch more than the stock.',
     },
     formula:
-      'modération = (1 − influençabilité) × disposition + influençabilité × [conditionalSlope] × croyance sur la modération + normale(0, [behaviorNoise]) ; envie = [maxCatch] × (1 − modération) ; si Σ envies > stock × [maxCatchableShare], chacun reçoit envie × (stock × [maxCatchableShare]) ÷ Σ envies',
-    params: ['maxCatch', 'maxCatchableShare', 'conditionalSlope', 'behaviorNoise'],
+      'modération = (1 − influençabilité) × disposition + influençabilité × [conditionalSlope] × croyance sur la modération, puis alignement par la peur ([fearSaturation]) + normale(0, [behaviorNoise]) ; prise = [maxCatch] × (1 − modération) × stock ÷ capacité',
+    params: ['maxCatch', 'conditionalSlope', 'fearSaturation', 'behaviorNoise'],
   },
   {
     id: 'sanctions',
     phase: 'season',
     title: { fr: '5. Les sanctions (si elles sont autorisées)', en: '5. Sanctions (if allowed)' },
     text: {
-      fr: 'Peuvent être sanctionnés les adultes qui ont versé nettement moins que la moyenne. Chaque adulte qui a de quoi payer peut, avec une probabilité qui grandit avec sa disposition, sanctionner l’un d’eux tiré au hasard (au plus un par saison). Il paie un coût, l’autre perd davantage. Un sanctionneur peut lui-même être ciblé par un autre. Les sanctions ont lieu après la récolte et la pêche, avant les repas : une amende peut donc faire basculer quelqu’un dans la faim (sa réserve est ramenée à zéro, il n’y a pas de dette). Elles ne changent le comportement que par la peur (étapes 2 et 8). Limites assumées : les sanctions ne portent que sur le grenier, jamais sur la pêche (personne n’est sanctionné pour avoir trop pêché, ce qui explique que l’étang puisse s’effondrer même avec les sanctions) ; et personne ne sanctionne les généreux, alors que les expériences observent aussi ce comportement.',
-      en: 'Adults who gave clearly less than average can be punished. Each adult who can afford it may, with a probability that grows with their disposition, punish one of them drawn at random (at most one per season). They pay a cost, the other loses more. A punisher can be targeted by someone else. Sanctions happen after harvest and fishing, before meals: a fine can therefore push someone into hunger (their reserve is reset to zero, there is no debt). They change behaviour only through fear (steps 2 and 8). Accepted limits: sanctions only concern the granary, never fishing (nobody is punished for overfishing, which is why the pond can collapse even with sanctions); and nobody punishes generous people, although experiments also observe this behaviour.',
+      fr: 'Deux domaines, autorisés séparément : le grenier (ceux qui ont versé nettement moins que la moyenne) et la pêche (ceux dont la modération est nettement inférieure à la moyenne). Dans chaque domaine, chaque adulte qui a de quoi payer peut, avec une probabilité qui grandit avec sa disposition, sanctionner l’un des fautifs tiré au hasard (au plus un par domaine et par saison). Il paie un coût, l’autre perd davantage. Un sanctionneur peut lui-même être ciblé. Les sanctions ont lieu après la récolte et la pêche, avant les repas : une amende peut donc faire basculer quelqu’un dans la faim (sa réserve est ramenée à zéro, il n’y a pas de dette). Elles ne changent le comportement que par la peur (étapes 2, 4 et 8). Limite assumée : personne ne sanctionne les généreux, alors que les expériences observent aussi ce comportement.',
+      en: 'Two domains, allowed separately: the granary (those who gave clearly less than average) and fishing (those whose restraint is clearly below average). In each domain, each adult who can afford it may, with a probability that grows with their disposition, punish one of the offenders drawn at random (at most one per domain and per season). They pay a cost, the other loses more. A punisher can be targeted by someone else. Sanctions happen after harvest and fishing, before meals: a fine can therefore push someone into hunger (their reserve is reset to zero, there is no debt). They change behaviour only through fear (steps 2, 4 and 8). Accepted limit: nobody punishes generous people, although experiments also observe this behaviour.',
     },
     formula:
-      'cibles = adultes dont part < moyenne − [sanctionGap] ; probabilité de sanctionner = disposition × [sanctionPropensity] ; sanctionneur −[sanctionCost], sanctionné −[sanctionFine]',
-    params: ['sanctionsEnabled', 'sanctionGap', 'sanctionPropensity', 'sanctionCost', 'sanctionFine'],
+      'grenier si [sanctionsEnabled], pêche si [pondSanctionsEnabled] : cibles = adultes dont la coopération < moyenne − [sanctionGap] ; probabilité de sanctionner = disposition × [sanctionPropensity] ; sanctionneur −[sanctionCost], sanctionné −[sanctionFine]',
+    params: ['sanctionsEnabled', 'pondSanctionsEnabled', 'sanctionGap', 'sanctionPropensity', 'sanctionCost', 'sanctionFine'],
   },
   {
     id: 'meals',
@@ -146,10 +146,10 @@ export const RULES: Rule[] = [
     phase: 'season',
     title: { fr: '8. La mémoire des sanctions', en: '8. Memory of sanctions' },
     text: {
-      fr: 'La peur d’être sanctionné s’estompe avec le temps et grandit avec chaque sanction reçue.',
-      en: 'The fear of being punished fades over time and grows with every sanction received.',
+      fr: 'La peur d’être sanctionné s’estompe avec le temps et grandit avec chaque sanction reçue. Il y a deux peurs distinctes : une pour le grenier, une pour la pêche.',
+      en: 'The fear of being punished fades over time and grows with every sanction received. There are two separate fears: one for the granary, one for fishing.',
     },
-    formula: 'mémoire = mémoire × [fearDecay] + sanctions reçues × [sanctionFine]',
+    formula: 'pour chaque domaine : mémoire = mémoire × [fearDecay] + sanctions reçues dans ce domaine × [sanctionFine]',
     params: ['fearDecay', 'sanctionFine'],
   },
   {
@@ -157,11 +157,11 @@ export const RULES: Rule[] = [
     phase: 'season',
     title: { fr: '9. L’étang se repeuple', en: '9. The pond restocks' },
     text: {
-      fr: 'Les poissons se reproduisent selon une croissance logistique, et quelques poissons arrivent de la rivière. Un étang très bas se repeuple très lentement.',
-      en: 'Fish reproduce following logistic growth, and a few fish arrive from the river. A very low pond restocks very slowly.',
+      fr: 'Les poissons se reproduisent selon une croissance logistique. Un étang très bas se repeuple lentement, mais il se repeuple si l’on pêche peu, puisque la prise baisse avec le stock.',
+      en: 'Fish reproduce following logistic growth. A very low pond restocks slowly, but it does restock if fishing is light, since the catch falls with the stock.',
     },
-    formula: 'stock = min(capacité, stock + [pondGrowth] × stock × (1 − stock ÷ capacité) + [pondRestock] × capacité)',
-    params: ['pondGrowth', 'pondRestock'],
+    formula: 'stock = min(capacité, stock + [pondGrowth] × stock × (1 − stock ÷ capacité))',
+    params: ['pondGrowth'],
   },
   {
     id: 'death',
@@ -204,8 +204,8 @@ export const RULES: Rule[] = [
     phase: 'year',
     title: { fr: 'Les indicateurs', en: 'Indicators' },
     text: {
-      fr: 'Mesurés à la fin de chaque saison, sans effet sur la simulation. Les inégalités sont mesurées par l’indice de Gini des réserves des adultes : 0 si tout le monde a la même chose, proche de 1 si une seule personne a presque tout. L’étang est dit épuisé sous un seuil de sa capacité.',
-      en: 'Measured at the end of every season, with no effect on the simulation. Inequality is measured by the Gini index of adults’ reserves: 0 if everyone has the same, close to 1 if one person has almost everything. The pond is called depleted below a threshold of its capacity.',
+      fr: 'Mesurés à la fin de chaque saison, sans effet sur la simulation. Deux mesures d’inégalités par l’indice de Gini (0 : tout le monde pareil ; proche de 1 : une personne a presque tout). Les inégalités de revenu portent sur ce que chaque adulte a gagné dans la saison : elles reflètent les comportements. Les inégalités de patrimoine portent sur les réserves accumulées : elles reflètent surtout l’âge et l’héritage, même dans un village de villageois identiques (Gini d’environ 0,6), car la nourriture ne se perd pas. La répartition des dispositions est mesurée par tranches de 0,1. L’étang est dit épuisé sous un seuil de sa capacité.',
+      en: 'Measured at the end of every season, with no effect on the simulation. Two inequality measures using the Gini index (0: everyone alike; close to 1: one person has almost everything). Income inequality covers what each adult earned during the season: it reflects behaviour. Wealth inequality covers accumulated reserves: it mostly reflects age and inheritance, even in a village of identical villagers (Gini around 0.6), because food never spoils. The distribution of dispositions is measured in bands of 0.1. The pond is called depleted below a threshold of its capacity.',
     },
     formula: 'étang épuisé si stock < [pondDepletedThreshold] × capacité',
     params: ['pondDepletedThreshold'],

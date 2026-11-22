@@ -29,12 +29,8 @@ export interface SimParams {
   pondGrowth: number;
   /** Pêche maximale d'un villageois par saison. */
   maxCatch: number;
-  /** Part maximale du stock qu'on peut pêcher en une saison. */
-  maxCatchableShare: number;
   /** En dessous de cette fraction de la capacité, l'étang est épuisé. */
   pondDepletedThreshold: number;
-  /** Poissons qui reviennent de la rivière chaque saison (fraction de la capacité) : un étang vide peut renaître si on le laisse tranquille. */
-  pondRestock: number;
 
   // Comportement
   /**
@@ -49,6 +45,8 @@ export interface SimParams {
 
   // Sanctions
   sanctionsEnabled: boolean;
+  /** Sanctions contre la surpêche, avec les mêmes coût, perte, écart et propension. */
+  pondSanctionsEnabled: boolean;
   /** Coût payé par celui qui sanctionne. */
   sanctionCost: number;
   /** Perte infligée au villageois sanctionné. */
@@ -97,15 +95,14 @@ export const DEFAULT_PARAMS: SimParams = {
   pondCapacityPerVillager: 50,
   pondGrowth: 0.3,
   maxCatch: 4,
-  maxCatchableShare: 0.5,
   pondDepletedThreshold: 0.05,
-  pondRestock: 0.005,
 
   conditionalSlope: 0.9,
   beliefLearningRate: 0.4,
   behaviorNoise: 0.04,
 
   sanctionsEnabled: false,
+  pondSanctionsEnabled: false,
   sanctionCost: 1,
   sanctionFine: 3,
   sanctionGap: 0.1,

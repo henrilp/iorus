@@ -14,8 +14,10 @@ export interface Villager {
   beliefShare: number;
   /** Modération que le villageois croit que les autres ont à l'étang (1 = personne ne pêche). */
   beliefRestraint: number;
-  /** Mémoire des sanctions reçues. */
-  fear: number;
+  /** Mémoire des sanctions reçues pour avoir peu versé au grenier. */
+  fearGranary: number;
+  /** Mémoire des sanctions reçues pour avoir trop pêché. */
+  fearPond: number;
   wealth: number;
   /** Âge en saisons. */
   ageSeasons: number;
@@ -33,9 +35,14 @@ export interface LastActions {
   share: number;
   contributed: number;
   received: number;
+  /** Effort de pêche : 1 − modération. */
+  effort: number;
   caught: number;
   sanctionsGiven: number;
+  /** Sanctions reçues pour le grenier. */
   sanctionsReceived: number;
+  /** Sanctions reçues pour la pêche. */
+  pondSanctionsReceived: number;
 }
 
 export interface Traits {
@@ -64,7 +71,6 @@ export interface SeasonMetrics {
   population: number;
   adults: number;
   meanWealth: number;
-  gini: number;
   /** Stock de l'étang en fraction de sa capacité. */
   pond: number;
   pondDepleted: boolean;
@@ -72,7 +78,15 @@ export interface SeasonMetrics {
   meanShare: number;
   meanDisposition: number;
   meanInfluence: number;
+  /** Répartition des dispositions de toute la population en 10 tranches de 0,1 (parts qui somment à 1). */
+  dispositionBins: number[];
+  /** Inégalités de patrimoine : Gini des réserves des adultes (âge et héritage compris). */
+  wealthGini: number;
+  /** Inégalités de revenu : Gini de ce que chaque adulte a gagné cette saison, avant les repas. */
+  incomeGini: number;
+  /** Sanctions de la saison, grenier et pêche confondus. */
   sanctions: number;
+  pondSanctions: number;
   births: number;
   deaths: number;
 }

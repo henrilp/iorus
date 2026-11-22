@@ -206,8 +206,8 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     group: 'environment',
     label: { fr: 'Croissance de l’étang', en: 'Pond growth' },
     help: {
-      fr: 'Vitesse à laquelle les poissons se reproduisent (croissance logistique) : rapide quand l’étang est à moitié plein, lente quand il est presque vide ou presque plein. La pêche durable maximale vaut croissance × capacité ÷ 4 par saison.',
-      en: 'How fast fish reproduce (logistic growth): fast when the pond is half full, slow when it is nearly empty or nearly full. Maximum sustainable catch is growth × capacity ÷ 4 per season.',
+      fr: 'Vitesse à laquelle les poissons se reproduisent (croissance logistique) : rapide quand l’étang est à moitié plein, lente quand il est presque vide ou presque plein. La pêche durable maximale vaut croissance × capacité ÷ 4 par saison, atteinte quand l’étang est à moitié plein. Avec la pêche de Schaefer, l’étang ne s’éteint que si l’effort total du village dépasse croissance × capacité ÷ pêche maximale.',
+      en: 'How fast fish reproduce (logistic growth): fast when the pond is half full, slow when it is nearly empty or nearly full. Maximum sustainable catch is growth × capacity ÷ 4 per season, reached when the pond is half full. With Schaefer fishing, the pond only dies out if the village’s total effort exceeds growth × capacity ÷ maximum catch.',
     },
     unit: { fr: 'par saison', en: 'per season' },
     min: 0,
@@ -215,47 +215,21 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     step: 0.05,
     status: 'a-sourcer',
     note: {
-      fr: 'La croissance logistique est le modèle standard des ressources halieutiques (modèle de Schaefer) ; la valeur choisie est une hypothèse.',
-      en: 'Logistic growth is the standard model for fish stocks (Schaefer model); the chosen value is an assumption.',
+      fr: 'La croissance logistique et la prise proportionnelle à l’effort et au stock forment le modèle standard des ressources halieutiques (Schaefer, 1954) ; la valeur choisie est une hypothèse. Voir la décision 0010.',
+      en: 'Logistic growth and a catch proportional to effort and stock form the standard fish-stock model (Schaefer, 1954); the chosen value is an assumption. See decision 0010.',
     },
   },
   maxCatch: {
     group: 'environment',
     label: { fr: 'Pêche maximale', en: 'Maximum catch' },
     help: {
-      fr: 'Ce que pêche en une saison un villageois qui ne se modère pas du tout. Un poisson vaut une unité de nourriture.',
-      en: 'What a villager who shows no restraint at all catches in one season. One fish is worth one unit of food.',
+      fr: 'Ce que pêche en une saison un villageois qui ne se modère pas du tout, quand l’étang est plein. Sa prise baisse avec le stock : à moitié plein, il en attrape moitié moins (modèle de Schaefer). Un poisson vaut une unité de nourriture.',
+      en: 'What a villager who shows no restraint at all catches in one season when the pond is full. Their catch falls with the stock: half full, they catch half as much (Schaefer model). One fish is worth one unit of food.',
     },
     unit: PER_SEASON,
     min: 0,
     max: 30,
     step: 0.5,
-    status: 'hypothese',
-  },
-  maxCatchableShare: {
-    group: 'environment',
-    label: { fr: 'Part pêchable par saison', en: 'Catchable share per season' },
-    help: {
-      fr: 'Part maximale du stock que le village peut pêcher en une saison. Si tout le monde veut plus, chacun reçoit au prorata de ce qu’il voulait.',
-      en: 'Maximum share of the stock the village can catch in one season. If everyone wants more, each gets a share proportional to what they wanted.',
-    },
-    unit: FRACTION,
-    min: 0,
-    max: 1,
-    step: 0.05,
-    status: 'hypothese',
-  },
-  pondRestock: {
-    group: 'environment',
-    label: { fr: 'Poissons venus de la rivière', en: 'Fish from the river' },
-    help: {
-      fr: 'Poissons qui arrivent chaque saison de l’extérieur, en fraction de la capacité. Sans eux, un étang vidé ne pourrait jamais renaître, même si plus personne ne pêche.',
-      en: 'Fish arriving from outside every season, as a fraction of capacity. Without them, an emptied pond could never recover, even if nobody fished any more.',
-    },
-    unit: FRACTION,
-    min: 0,
-    max: 0.1,
-    step: 0.001,
     status: 'hypothese',
   },
   pondDepletedThreshold: {
@@ -324,6 +298,19 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     },
     status: 'hypothese',
   },
+  pondSanctionsEnabled: {
+    group: 'sanctions',
+    label: { fr: 'Sanctions contre la surpêche', en: 'Sanctions against overfishing' },
+    help: {
+      fr: 'Autorise un villageois à payer pour faire perdre de la nourriture à un autre qui pêche nettement plus que la moyenne (dont la modération est nettement inférieure). Mêmes coût, perte, écart toléré et propension que pour le grenier ; une mémoire de la peur distincte.',
+      en: 'Allows a villager to pay to make another one, who fishes clearly more than average (whose restraint is clearly lower), lose food. Same cost, fine, tolerated gap and propensity as for the granary; a separate memory of fear.',
+    },
+    status: 'hypothese',
+    note: {
+      fr: 'Dans les expériences sur les ressources communes, la possibilité de sanctionner réduit la surexploitation (Ostrom, Walker et Gardner, 1992, à vérifier) ; la surveillance et les sanctions graduées font partie des principes d’Ostrom pour gérer un commun (1990). Voir la décision 0011.',
+      en: 'In common-pool resource experiments, the possibility of sanctioning reduces overuse (Ostrom, Walker and Gardner, 1992, to be checked); monitoring and graduated sanctions are among Ostrom’s design principles for managing a commons (1990). See decision 0011.',
+    },
+  },
   sanctionCost: {
     group: 'sanctions',
     label: { fr: 'Coût d’une sanction', en: 'Cost of a sanction' },
@@ -362,8 +349,8 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     group: 'sanctions',
     label: { fr: 'Écart toléré', en: 'Tolerated gap' },
     help: {
-      fr: 'On ne peut être sanctionné que si sa part versée au grenier est inférieure à la moyenne d’au moins cet écart (0,1 = 10 points de récolte).',
-      en: 'One can only be punished if one’s share given to the granary is below average by at least this gap (0.1 = 10 points of harvest).',
+      fr: 'On ne peut être sanctionné que si sa coopération est inférieure à la moyenne d’au moins cet écart : sa part versée au grenier, ou sa modération à l’étang (0,1 = 10 points).',
+      en: 'One can only be punished if one’s cooperation is below average by at least this gap: one’s share given to the granary, or one’s restraint at the pond (0.1 = 10 points).',
     },
     unit: FRACTION,
     min: 0,
@@ -392,7 +379,7 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     group: 'sanctions',
     label: { fr: 'Mémoire des sanctions', en: 'Memory of sanctions' },
     help: {
-      fr: 'Part de la « peur » d’être sanctionné qui reste d’une saison à l’autre. 0,8 : la peur s’estompe de 20 % par saison sans nouvelle sanction.',
+      fr: 'Part de la « peur » d’être sanctionné qui reste d’une saison à l’autre (une peur pour le grenier, une pour la pêche). 0,8 : la peur s’estompe de 20 % par saison sans nouvelle sanction.',
       en: 'Share of the “fear” of being punished that carries over from one season to the next. 0.8: fear fades by 20% per season without a new sanction.',
     },
     unit: FRACTION,

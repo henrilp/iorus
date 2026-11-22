@@ -1,6 +1,6 @@
 # 0006. Premier calibrage : survivre sans partager est possible, les enfants coûtent, l'étang peut renaître
 
-- Statut : Acceptée
+- Statut : Acceptée ; en partie remplacée par [0010](0010-peche-de-schaefer.md) (les poissons venus de la rivière)
 - Date : 2026-11-22
 
 ## Contexte

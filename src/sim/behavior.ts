@@ -25,15 +25,19 @@ export function conditionalChoice(
 export function granaryShare(v: Villager, params: SimParams, rng: Rng): number {
   const base = conditionalChoice(v.disposition, v.influence, v.beliefShare, params);
   // La peur des sanctions pousse à s'aligner sur ce que font les autres.
-  const fearFactor = Math.min(1, v.fear / params.fearSaturation);
-  const deterred = base + Math.max(0, v.beliefShare - base) * fearFactor;
-  return clamp01(deterred + rng.normal(0, params.behaviorNoise));
+  return clamp01(deter(base, v.beliefShare, v.fearGranary, params) + rng.normal(0, params.behaviorNoise));
+}
+
+/** La peur d'être sanctionné pousse à s'aligner sur ce qu'on croit que font les autres (jamais à faire moins bien). */
+function deter(base: number, belief: number, fear: number, params: SimParams): number {
+  const fearFactor = Math.min(1, fear / params.fearSaturation);
+  return base + Math.max(0, belief - base) * fearFactor;
 }
 
 /** Modération à l'étang : 1 = ne pêche pas, 0 = pêche le maximum. */
 export function pondRestraint(v: Villager, params: SimParams, rng: Rng): number {
   const base = conditionalChoice(v.disposition, v.influence, v.beliefRestraint, params);
-  return clamp01(base + rng.normal(0, params.behaviorNoise));
+  return clamp01(deter(base, v.beliefRestraint, v.fearPond, params) + rng.normal(0, params.behaviorNoise));
 }
 
 /** Probabilité de sanctionner un villageois qui contribue nettement moins que les autres. */

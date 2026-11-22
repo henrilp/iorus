@@ -12,6 +12,13 @@ export function gini(values: readonly number[]): number {
   return (2 * weighted) / (n * total) - (n + 1) / n;
 }
 
+/** Parts de la population dans 10 tranches de 0,1 (la dernière inclut 1). */
+export function bins10(values: readonly number[]): number[] {
+  const counts = new Array<number>(10).fill(0);
+  for (const x of values) counts[Math.min(9, Math.max(0, Math.floor(x * 10)))]! += 1;
+  return values.length === 0 ? counts : counts.map((c) => c / values.length);
+}
+
 export function mean(values: readonly number[]): number {
   if (values.length === 0) return 0;
   return values.reduce((s, x) => s + x, 0) / values.length;

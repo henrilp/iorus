@@ -81,8 +81,8 @@ Ce modèle à deux traits remplace une première version à un seul trait, qui f
 
 1. **Travail** : chaque adulte produit une récolte (valeur de base plus un léger aléa).
 2. **Grenier** : chacun verse une part de sa récolte au pot commun. Le total est multiplié par `r` (avec 1 < r < nombre de villageois), puis réparti à parts égales entre tous. C'est le dilemme : collectivement on gagne à contribuer, individuellement on gagne à ne pas le faire.
-3. **Étang** : chacun pêche. Le stock se renouvelle selon une croissance logistique (il repousse vite quand il est à mi-niveau, lentement quand il est presque vide ou presque plein), plus quelques poissons venus de la rivière, pour qu'un étang laissé en paix puisse renaître. En dessous d'un seuil, l'étang est déclaré épuisé (simple indicateur).
-4. **Sanctions** (si l'option est active) : après avoir vu les contributions, un villageois peut payer un coût pour faire perdre davantage à un villageois qui a versé nettement moins que la moyenne (rapport de l'ordre de 1 pour 3 dans les expériences, à vérifier). L'écart à la moyenne décide qui peut être ciblé ; la probabilité de sanctionner dépend de la disposition du sanctionneur. Les sanctions ne portent que sur le grenier, jamais sur la pêche, et n'agissent sur le comportement que par la peur. Voir la décision [0007](decisions/0007-sanctions-limitees-au-grenier.md).
+3. **Étang** : chacun pêche avec un effort qui dépend de sa modération ; sa prise est proportionnelle à son effort et au stock (modèle de Schaefer), donc plus le poisson se fait rare, plus il est dur à attraper. Le stock se renouvelle selon une croissance logistique (vite quand il est à mi-niveau, lentement quand il est presque vide ou presque plein). En dessous d'un seuil, l'étang est déclaré épuisé (simple indicateur). Voir la décision [0010](decisions/0010-peche-de-schaefer.md).
+4. **Sanctions** (deux options indépendantes, grenier et pêche) : un villageois peut payer un coût pour faire perdre davantage à un villageois qui a versé nettement moins que la moyenne au grenier, ou dont la modération à l'étang est nettement inférieure à la moyenne (rapport de l'ordre de 1 pour 3 dans les expériences, à vérifier). L'écart à la moyenne décide qui peut être ciblé ; la probabilité de sanctionner dépend de la disposition du sanctionneur. Les sanctions n'agissent sur le comportement que par la peur, une par domaine. Voir les décisions [0007](decisions/0007-sanctions-limitees-au-grenier.md) et [0011](decisions/0011-sanctions-de-la-surpeche.md).
 5. **Repas** : chaque adulte mange une quantité fixe ; chaque enfant mange sur la réserve de son parent (ou la sienne s'il est orphelin) et ne travaille pas. Une réserve négative est ramenée à zéro (pas de dette) ; plusieurs saisons de faim consécutives tuent.
 6. **Mise à jour des croyances** à partir de ce qui a été observé.
 
@@ -96,18 +96,18 @@ Ce modèle à deux traits remplace une première version à un seul trait, qui f
 
 ### Ce que l'on mesure
 
-Population, richesse moyenne, inégalités (indice de Gini), stock de l'étang, part moyenne contribuée au grenier, disposition et influençabilité moyennes, nombre de sanctions.
+Population, richesse moyenne, inégalités de revenu et de patrimoine (indice de Gini), stock de l'étang, part moyenne contribuée au grenier, disposition et influençabilité moyennes, répartition des dispositions par tranches de 0,1, sanctions par domaine. Les inégalités de patrimoine reflètent surtout l'âge et l'héritage, celles de revenu les comportements : voir la décision [0012](decisions/0012-mesures-honnetes.md).
 
 ## Réglages du joueur
 
 - **Taille du village** : de 10 à 60 villageois, 30 par défaut.
 - **Composition**, en trois modes, chacun réglant la disposition et l'influençabilité :
   - « Tous pareils » : un curseur I/Us et un curseur d'influençabilité.
-  - « Deux groupes » : proportion de chaque groupe, et les deux traits de chacun.
+  - « Deux profils de départ » : part de chaque profil, et les deux traits de chacun. Ce ne sont pas des groupes : personne ne sait à quel profil appartient l'autre, et les profils se mélangent dès la première génération.
   - « Mélange » : moyenne et dispersion de chaque trait.
 - L'influençabilité par défaut vaut 0,7 : la plupart des gens observés en laboratoire sont des coopérateurs conditionnels (à sourcer).
 - **Inclure mon villageois** : oui par défaut si l'intro a été jouée.
-- **Sanctions entre villageois** : autorisées ou non.
+- **Sanctions entre villageois** : pour le grenier et contre la surpêche, chacune autorisée ou non.
 - **Durée** : nombre de générations (10 par défaut) ou « jusqu'à ce que je m'arrête ».
 - **Graine** : affichée et modifiable, pour rejouer exactement la même partie.
 
@@ -119,7 +119,7 @@ Le réglage dit « I/Us » côté joueur. Dans le jeu, aucun libellé politique.
 - **Les traits (disposition, influençabilité) ne sont pas affichés par défaut.** Un clic sur un villageois ouvre sa fiche : nom, âge, réserve, ce qu'il a fait les dernières saisons, son parent.
 - **Signes visuels** : niveau du grenier, poissons visibles dans l'étang, maisons vides quand la population baisse, petite icône lors d'une sanction.
 - **Contrôle du temps** : pause, ×1, ×4, ×32, et « passer 10 ans » (calcul sans animation).
-- **Panneau de courbes**, repliable : population, richesse et Gini, stock de l'étang, contribution moyenne, disposition et influençabilité moyennes.
+- **Panneau de courbes**, repliable : population, inégalités de revenu et de patrimoine, stock de l'étang, contribution moyenne, traits moyens et répartition des dispositions.
 - **Lignée du joueur** : un repère discret permet de suivre son villageois puis ses descendants.
 
 ## Fin de partie
@@ -171,8 +171,9 @@ Le moteur doit reproduire qualitativement ces comportements. Chacun est un test 
 2. **Village généreux** : 100 % de dispositions hautes. La contribution reste élevée, l'étang ne s'épuise pas.
 3. **Passager clandestin** : une majorité de villageois coopératifs et influençables plus 10 à 20 % de profiteurs purs (disposition basse, insensibles aux autres), sans sanctions. La contribution moyenne décline au fil des saisons.
 4. **Sanctions** : même population avec sanctions. La contribution se maintient nettement mieux qu'au test 3.
-5. **Tragédie des communs** : 100 % de dispositions basses. L'étang s'épuise.
+5. **Tragédie des communs** : 100 % de dispositions basses. L'étang est surexploité : il tombe sous la moitié de sa capacité et bien plus bas qu'avec des pêcheurs modérés (surexploitation, pas forcément extinction).
 6. **Invasion** : sur plusieurs générations sans sanctions, une petite minorité de profiteurs progresse dans une population de coopérateurs influençables (à confirmer : ce résultat dépend du calibrage, c'est justement ce que le jeu explore).
+7. **Sanctions de la surpêche** : avec une minorité de profiteurs, l'étang est mieux préservé quand la surpêche peut être sanctionnée.
 
 ## À vérifier à la main (recette)
 

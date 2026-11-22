@@ -1,5 +1,5 @@
 import { clamp01, granaryShare, pondRestraint, sanctionProbability } from './behavior';
-import { gini, mean } from './metrics';
+import { bins10, gini, mean } from './metrics';
 import { DEFAULT_PARAMS, type SimParams } from './params';
 import { Rng } from './rng';
 import type { Composition, SeasonMetrics, SimConfig, SimState, Traits, Villager } from './types';
@@ -9,15 +9,18 @@ const emptyLast = () => ({
   share: 0,
   contributed: 0,
   received: 0,
+  effort: 0,
   caught: 0,
   sanctionsGiven: 0,
   sanctionsReceived: 0,
+  pondSanctionsReceived: 0,
 });
 
 export class Simulation {
   readonly state: SimState;
   private readonly rng: Rng;
   private sanctionsThisSeason = 0;
+  private pondSanctionsThisSeason = 0;
   /** Intentions de modération de la saison, gardées pour la mise à jour des croyances. */
   private readonly restraints = new Map<number, number>();
 
@@ -64,15 +67,23 @@ export class Simulation {
     if (adults.length > 0) {
       this.produceAndShare(adults);
       this.fish(adults);
-      const sanctions = p.sanctionsEnabled ? this.sanction(adults) : 0;
+      this.sanctionsThisSeason = p.sanctionsEnabled
+        ? this.sanction(adults, (v) => v.last.share, (v) => (v.last.sanctionsReceived += 1))
+        : 0;
+      this.pondSanctionsThisSeason = p.pondSanctionsEnabled
+        ? this.sanction(adults, (v) => this.restraints.get(v.id) ?? 0, (v) => (v.last.pondSanctionsReceived += 1))
+        : 0;
+      this.incomes = new Map(adults.map((v) => [v.id, this.seasonIncome(v)]));
       this.eat();
       this.updateBeliefs(adults);
       s.villagers.forEach((v) => {
-        v.fear = v.fear * p.fearDecay + v.last.sanctionsReceived * p.sanctionFine;
+        v.fearGranary = v.fearGranary * p.fearDecay + v.last.sanctionsReceived * p.sanctionFine;
+        v.fearPond = v.fearPond * p.fearDecay + v.last.pondSanctionsReceived * p.sanctionFine;
       });
-      this.sanctionsThisSeason = sanctions;
     } else {
       this.sanctionsThisSeason = 0;
+      this.pondSanctionsThisSeason = 0;
+      this.incomes = new Map();
     }
 
     this.regrowPond();
@@ -123,20 +134,26 @@ export class Simulation {
     }
   }
 
+  /**
+   * Pêche selon le modèle de Schaefer : la prise est proportionnelle à l'effort et au stock.
+   * Moins il reste de poissons, plus il faut d'effort pour en attraper un.
+   */
   private fish(adults: Villager[]): void {
     const s = this.state;
     const p = s.params;
     this.restraints.clear();
-    const desires = adults.map((v) => {
+    const density = s.pondCapacity > 0 ? s.pondStock / s.pondCapacity : 0;
+    const catches = adults.map((v) => {
       const restraint = pondRestraint(v, p, this.rng);
       this.restraints.set(v.id, restraint);
-      return p.maxCatch * (1 - restraint);
+      v.last.effort = 1 - restraint;
+      return p.maxCatch * v.last.effort * density;
     });
-    const totalDesire = desires.reduce((a, b) => a + b, 0);
-    const catchable = s.pondStock * p.maxCatchableShare;
-    const scale = totalDesire > catchable && totalDesire > 0 ? catchable / totalDesire : 1;
+    // Garde-fou : on ne peut pas pêcher plus de poissons qu'il n'y en a.
+    const total = catches.reduce((a, b) => a + b, 0);
+    const scale = total > s.pondStock && total > 0 ? s.pondStock / total : 1;
     adults.forEach((v, i) => {
-      const caught = (desires[i] ?? 0) * scale;
+      const caught = (catches[i] ?? 0) * scale;
       v.last.caught = caught;
       v.wealth += caught;
       s.pondStock -= caught;
@@ -144,10 +161,27 @@ export class Simulation {
     s.pondStock = Math.max(0, s.pondStock);
   }
 
-  private sanction(adults: Villager[]): number {
+  private incomes = new Map<number, number>();
+
+  /** Ce que l'adulte a gagné cette saison, sanctions comprises, avant les repas. */
+  private seasonIncome(v: Villager): number {
     const p = this.state.params;
-    const avgShare = mean(adults.map((v) => v.last.share));
-    const targets = adults.filter((v) => v.last.share < avgShare - p.sanctionGap);
+    const l = v.last;
+    return (
+      l.harvest - l.contributed + l.received + l.caught -
+      l.sanctionsGiven * p.sanctionCost -
+      (l.sanctionsReceived + l.pondSanctionsReceived) * p.sanctionFine
+    );
+  }
+
+  /**
+   * Sanctions informelles dans un domaine (grenier ou pêche) : sont ciblés ceux dont la coopération
+   * (part versée, ou modération à l'étang) est nettement inférieure à la moyenne.
+   */
+  private sanction(adults: Villager[], cooperation: (v: Villager) => number, mark: (target: Villager) => void): number {
+    const p = this.state.params;
+    const avg = mean(adults.map(cooperation));
+    const targets = adults.filter((v) => cooperation(v) < avg - p.sanctionGap);
     if (targets.length === 0) return 0;
     let count = 0;
     for (const punisher of adults) {
@@ -159,7 +193,7 @@ export class Simulation {
       punisher.wealth -= p.sanctionCost;
       target.wealth -= p.sanctionFine;
       punisher.last.sanctionsGiven += 1;
-      target.last.sanctionsReceived += 1;
+      mark(target);
       count += 1;
     }
     return count;
@@ -207,8 +241,7 @@ export class Simulation {
   private regrowPond(): void {
     const s = this.state;
     const growth = s.params.pondGrowth * s.pondStock * (1 - s.pondStock / s.pondCapacity);
-    const restock = s.params.pondRestock * s.pondCapacity;
-    s.pondStock = Math.min(s.pondCapacity, s.pondStock + growth + restock);
+    s.pondStock = Math.min(s.pondCapacity, s.pondStock + growth);
   }
 
   // --- Générations ---
@@ -290,7 +323,8 @@ export class Simulation {
       // On suppose au départ que les autres nous ressemblent.
       beliefShare: disposition,
       beliefRestraint: disposition,
-      fear: 0,
+      fearGranary: 0,
+      fearPond: 0,
       wealth: 0,
       ageSeasons: 0,
       // Personne ne meurt de vieillesse avant l'âge adulte.
@@ -313,13 +347,16 @@ export class Simulation {
       population: s.villagers.length,
       adults: adults.length,
       meanWealth: mean(adults.map((v) => v.wealth)),
-      gini: gini(adults.map((v) => v.wealth)),
+      wealthGini: gini(adults.map((v) => v.wealth)),
+      incomeGini: gini([...this.incomes.values()]),
       pond,
       pondDepleted: pond < p.pondDepletedThreshold,
       meanShare: mean(adults.map((v) => v.last.share)),
       meanDisposition: mean(s.villagers.map((v) => v.disposition)),
       meanInfluence: mean(s.villagers.map((v) => v.influence)),
-      sanctions: this.sanctionsThisSeason,
+      dispositionBins: bins10(s.villagers.map((v) => v.disposition)),
+      sanctions: this.sanctionsThisSeason + this.pondSanctionsThisSeason,
+      pondSanctions: this.pondSanctionsThisSeason,
       births,
       deaths,
     };
