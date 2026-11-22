@@ -183,3 +183,39 @@ describe('voisinage', () => {
     expect(c).not.toEqual(a);
   });
 });
+
+describe('sécheresse', () => {
+  const base: SimConfig = { ...config, life: undefined, params: {} };
+
+  test('désactivée par défaut : ses autres réglages ne changent rien', () => {
+    const a = new Simulation(base).run(200);
+    const b = new Simulation({ ...base, params: { droughtSeverity: 0.9, droughtSeasons: 12 } }).run(200);
+    expect(b).toEqual(a);
+    expect(a.some((m) => m.drought)).toBe(false);
+  });
+
+  test('elle commence au début d’une année, dure le nombre de saisons prévu, et réduit la récolte', () => {
+    const sim = new Simulation({ ...base, params: { droughtProbability: 0.3, droughtSeasons: 3, droughtSeverity: 0.5 } });
+    const history = sim.run(400);
+    const runs: { start: number; length: number }[] = [];
+    history.forEach((m, i) => {
+      if (!m.drought) return;
+      if (i === 0 || !history[i - 1]!.drought) runs.push({ start: m.season, length: 0 });
+      runs.at(-1)!.length += 1;
+    });
+    expect(runs.length).toBeGreaterThan(5);
+    for (const r of runs) {
+      expect((r.start - 1) % spy).toBe(0);
+      expect(r.length % 3).toBe(0);
+    }
+  });
+
+  test('pendant une sécheresse, les champs donnent moitié moins', () => {
+    const params = { droughtProbability: 1, droughtSeasons: 2, droughtSeverity: 0.5, harvestNoise: 0 };
+    const sim = new Simulation({ ...base, size: 10, params });
+    sim.step();
+    expect(sim.state.history[0]!.drought).toBe(true);
+    const harvests = sim.state.villagers.filter((v) => isAdult(v, sim.state.params)).map((v) => v.last.harvest);
+    for (const h of harvests) expect(h).toBeCloseTo(DEFAULT_PARAMS.baseHarvest * 0.5, 12);
+  });
+});

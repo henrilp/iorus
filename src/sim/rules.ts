@@ -68,11 +68,12 @@ export const RULES: Rule[] = [
     phase: 'season',
     title: { fr: '1. La récolte', en: '1. The harvest' },
     text: {
-      fr: 'Chaque adulte récolte. S’il y a plus d’adultes que de places dans les champs, la récolte de chacun baisse en proportion. Une part de hasard s’y ajoute. Les enfants ne récoltent pas.',
-      en: 'Every adult harvests. If there are more adults than places in the fields, everyone’s harvest drops proportionally. Some randomness is added. Children do not harvest.',
+      fr: 'Chaque adulte récolte. S’il y a plus d’adultes que de places dans les champs, la récolte de chacun baisse en proportion. Une part de hasard s’y ajoute. Les enfants ne récoltent pas. Si les sécheresses sont activées, une sécheresse peut commencer au début de chaque année, sauf pendant une sécheresse ; elle dure quelques saisons, pendant lesquelles les champs de tous donnent moins. Personne ne sait d’avance quand elle viendra ni combien de temps elle durera.',
+      en: 'Every adult harvests. If there are more adults than places in the fields, everyone’s harvest drops proportionally. Some randomness is added. Children do not harvest. If droughts are enabled, a drought may start at the beginning of each year, except during a drought; it lasts a few seasons, during which everyone’s fields yield less. Nobody knows in advance when it will come or how long it will last.',
     },
-    formula: 'récolte = max(0, [baseHarvest] × min(1, [farmlandCapacity] ÷ adultes) × (1 + normale(0, [harvestNoise])))',
-    params: ['baseHarvest', 'farmlandCapacity', 'harvestNoise'],
+    formula:
+      'sécheresse : au début de chaque année, avec probabilité [droughtProbability], pour [droughtSeasons] saisons ; récolte = max(0, [baseHarvest] × min(1, [farmlandCapacity] ÷ adultes) × (1 − [droughtSeverity] pendant une sécheresse) × (1 + normale(0, [harvestNoise])))',
+    params: ['baseHarvest', 'farmlandCapacity', 'harvestNoise', 'droughtProbability', 'droughtSeasons', 'droughtSeverity'],
   },
   {
     id: 'share',

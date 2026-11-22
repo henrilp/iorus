@@ -2,7 +2,7 @@
 
 Brouillon de travail pour la proposition [0020](decisions/0020-une-vie-puis-l-histoire.md) : la liste des moments où le jeu sollicite le joueur pendant sa vie, et ce que chacun fait dans le moteur. Ce document disparaîtra dans la spec si la proposition est acceptée.
 
-Un prototype en texte les met à l'épreuve : la page `vie/` (code dans `src/vie/`), sans graphismes ni déplacement. Tous les moments ci-dessous y sont, sauf la sécheresse (15), qui demande une règle nouvelle.
+Un prototype en texte les met à l'épreuve : la page `vie/` (code dans `src/vie/`), sans graphismes ni déplacement. Tous les moments ci-dessous y sont.
 
 ## Règles d'écriture
 
@@ -78,7 +78,7 @@ Ils peuvent aussi arriver pendant un chapitre ; entre deux chapitres, ils arrêt
 
 **14. Tu pourrais avoir un enfant.** La première fois que le joueur est en âge fertile avec une réserve au-dessus du seuil (`birthWealthThreshold`), puis à nouveau s'il a répondu « pas maintenant ». « Ta réserve : 43. Un enfant prend 20 à sa naissance, puis 3 par saison jusqu'à ses 16 ans. » Choix : je veux des enfants, pas maintenant, jamais. Moteur : « je veux » laisse jouer la règle commune (une chance par an tant que la réserve suffit) ; « pas maintenant » et « jamais » l'empêchent (C). Le joueur peut refuser un enfant, il ne peut pas en forcer un. Les naissances elles-mêmes sont racontées à l'ouverture du chapitre suivant, ou sur le moment pendant un chapitre.
 
-**15. Sécheresse.** Une ou deux fois par vie au plus, tirée de la graine. Parle : un voisin. « Les champs ont donné moitié moins. » Choix : les deux lignes de conduite (l'étang prend le relais, au risque de le vider). Moteur : nouvelle règle, une baisse de la récolte pendant quelques saisons, avec sa fréquence, sa durée et sa force au registre (F).
+**15. Sécheresse.** Environ deux fois par vie en moyenne dans le prototype (une chance sur 25 chaque année), tirée de la graine, sans plafond : certaines vies n'en auront pas, d'autres trois. Parle : un voisin. « Mes champs m'ont donné 5 cette saison. D'habitude, c'est autour de 10. » Choix : verser moins, pêcher davantage (l'étang prend le relais, au risque de le vider), verser davantage, ne rien changer. Moteur : une baisse de la récolte pendant quelques saisons, avec sa fréquence, sa durée et sa force au registre (F, [0024](decisions/0024-secheresse-en-option.md)).
 
 ### Fin de vie
 
@@ -93,7 +93,7 @@ Ils peuvent aussi arriver pendant un chapitre ; entre deux chapitres, ils arrêt
 
 ## Ce que le moteur doit gagner
 
-A à D sont faits ([0022](decisions/0022-le-joueur-conduit-son-villageois.md)), E l'est en option, désactivé par défaut ([0023](decisions/0023-voisinage-en-option.md)) ; F reste à faire.
+A à D sont faits ([0022](decisions/0022-le-joueur-conduit-son-villageois.md)) ; E et F le sont en option, désactivés par défaut ([0023](decisions/0023-voisinage-en-option.md), [0024](decisions/0024-secheresse-en-option.md)).
 
 - **A. Le joueur décide de sa conduite.** Sa part versée et sa modération viennent de sa ligne de conduite ou de ses gestes, pas de la règle de comportement, sans bruit et sans peur. La partie devient : graine, réglages et journal des choix ; rejouer le journal redonne la même partie. Déjà prévu par 0020, avec une fiche à part.
 - **B. Le joueur sanctionne une cible précise**, une fois, aux conditions des autres villageois.

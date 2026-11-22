@@ -18,6 +18,8 @@ export const PACING = {
   chapterYears: 1,
   /** Délai minimal, en saisons, avant qu'un même moment revienne. */
   cooldown: { hunger: 8, sanctioned: 8, childOffer: 8, cheater: 4, hungryNeighbor: 4 },
+  /** Probabilité annuelle de sécheresse proposée par défaut (paramètre du moteur, désactivé hors du prototype). */
+  droughtProbability: 0.04,
   /** Saisons de suite sous la moyenne avant qu'un voisin soit signalé. */
   cheaterStreak: 2,
   /** Nombre de voisins dont on parle quand le voisinage du moteur est désactivé. */
@@ -120,6 +122,8 @@ export class LifeSession {
   private deathAge = 0;
   private deathWealth = 0;
   private starved = false;
+  /** Vrai si une sécheresse a commencé à la saison qui vient d'être calculée. */
+  private droughtStarted = false;
 
   constructor(settings: LifeSettings) {
     this.settings = settings;
@@ -285,6 +289,9 @@ export class LifeSession {
       return;
     }
     if (v.wealth >= this.p.birthWealthThreshold) this.reachedBirthWealth = true;
+    const history = this.sim.state.history;
+    this.droughtStarted = !!history.at(-1)?.drought && !history.at(-2)?.drought;
+    if (this.droughtStarted && this.phase !== 'chapter') this.event(`Une sécheresse, quand tu avais ${Math.floor(this.ageYears)} ans.`);
     if (this.phase === 'chapter') this.note('season', this.seasonText(v));
     this.sanctionOutcomes();
   }
@@ -342,6 +349,7 @@ export class LifeSession {
     // L'âge pendant la saison écoulée (on vieillit à sa fin).
     const head = `${season}, ${Math.floor((v.ageSeasons - 1) / this.p.seasonsPerYear)} ans.`;
     const parts: string[] = [head];
+    if (s.history.at(-1)?.drought) parts.push('Sécheresse : les champs donnent moins.');
     const l = v.last;
     if (!isAdult(v, this.p) || (l.harvest === 0 && l.share === 0)) {
       const parent = this.byId(this.parentId);
@@ -556,6 +564,33 @@ export class LifeSession {
     const p = this.p;
     const c = PACING.cooldown;
     const kids = this.children().filter((k) => !isAdult(k, p)).length;
+
+    if (this.droughtStarted) {
+      this.droughtStarted = false;
+      const witness = this.neighbors().find((n) => isAdult(n, p));
+      const need = p.consumption + kids * p.childConsumption;
+      this.push({
+        id: 'drought',
+        title: 'Sécheresse',
+        speaker: witness ? this.relation(witness) : undefined,
+        lines: [
+          witness ? `« Mes champs m’ont donné ${fmt(witness.last.harvest)} cette saison. D’habitude, c’est autour de ${fmt(p.baseHarvest)}. »` : '',
+          `Tu as récolté ${fmt(v.last.harvest)}. Tu manges ${fmt(p.consumption)} par saison${kids > 0 ? `, et tes enfants ${fmt(kids * p.childConsumption)} : ${fmt(need)} en tout` : ''}. Ta réserve : ${fmt(v.wealth)}.`,
+          'Personne ne sait combien de temps ça durera. L’étang n’est pas touché ; le grenier partage ce que chacun y verse.',
+          `Tu verses ${this.conductText('share')} au grenier et tu pêches ${this.conductText('restraint')}.`,
+        ].filter(Boolean),
+        // On ne propose pas ce que le joueur fait déjà.
+        choices: [
+          { label: 'Verser presque rien', change: { share: 0.1 } },
+          { label: 'Pêcher tout ce que je peux', change: { restraint: 0 } },
+          { label: 'Verser beaucoup', change: { share: 0.7 } },
+        ]
+          .filter(({ change }) => Object.entries(change).some(([k, val]) => this.conduct?.[k as 'share' | 'restraint'] !== val))
+          .map(({ label, change }) => ({ label, run: () => this.setConduct(change) }))
+          .concat([{ label: 'Ne rien changer', run: () => undefined }]),
+      });
+      return true;
+    }
 
     if (v.hungerSeasons > 0 && this.ready('hunger', c.hunger)) {
       this.push({

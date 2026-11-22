@@ -136,6 +136,8 @@ export interface SeasonMetrics {
   wealthGini: number;
   /** Inégalités de revenu : Gini de ce que chaque adulte a gagné cette saison, avant les repas. */
   incomeGini: number;
+  /** Vrai si la saison a été une saison de sécheresse. */
+  drought: boolean;
   /** Sanctions de la saison, grenier et pêche confondus. */
   sanctions: number;
   pondSanctions: number;
@@ -152,6 +154,8 @@ export interface SimState {
   nextId: number;
   history: SeasonMetrics[];
   extinct: boolean;
+  /** Saisons de sécheresse qui restent, celle en cours comprise ; 0 hors sécheresse. */
+  droughtLeft: number;
   /** Le villageois que le joueur conduit, tant qu'il vit ; null sinon. */
   controlledId: number | null;
   /** Sa ligne de conduite actuelle. */

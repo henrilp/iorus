@@ -53,6 +53,7 @@ export class Simulation {
       nextId: 0,
       history: [],
       extinct: false,
+      droughtLeft: 0,
       controlledId: null,
       conduct: null,
       journal: [],
@@ -158,6 +159,8 @@ export class Simulation {
     const adults = s.villagers.filter((v) => this.isAdult(v));
     for (const v of s.villagers) v.last = emptyLast();
     s.playerSanctions = [];
+    this.startDrought();
+    const drought = s.droughtLeft > 0;
 
     if (adults.length > 0) {
       this.produceAndShare(adults);
@@ -186,6 +189,7 @@ export class Simulation {
       this.incomes = new Map();
     }
     this.pendingSanctions.clear();
+    if (s.droughtLeft > 0) s.droughtLeft -= 1;
 
     this.regrowPond();
 
@@ -198,7 +202,7 @@ export class Simulation {
     }
 
     s.extinct = s.villagers.length === 0;
-    const metrics = this.measure(births, deaths);
+    const metrics = this.measure(births, deaths, drought);
     s.history.push(metrics);
     return metrics;
   }
@@ -216,12 +220,26 @@ export class Simulation {
 
   // --- Étapes d'une saison ---
 
+  /**
+   * Au début de chaque année, hors sécheresse, une sécheresse peut commencer (fiche 0024).
+   * Rien n'est tiré quand la probabilité est nulle : le reste de la partie ne change pas.
+   */
+  private startDrought(): void {
+    const s = this.state;
+    const p = s.params;
+    const newYear = (s.season - 1) % p.seasonsPerYear === 0;
+    if (p.droughtProbability > 0 && newYear && s.droughtLeft === 0 && this.rng.chance(p.droughtProbability)) {
+      s.droughtLeft = p.droughtSeasons;
+    }
+  }
+
   private produceAndShare(adults: Villager[]): void {
     const p = this.state.params;
     const landFactor = Math.min(1, p.farmlandCapacity / adults.length);
+    const weather = this.state.droughtLeft > 0 ? 1 - p.droughtSeverity : 1;
     let pot = 0;
     for (const v of adults) {
-      const harvest = Math.max(0, p.baseHarvest * landFactor * (1 + this.rng.normal(0, p.harvestNoise)));
+      const harvest = Math.max(0, p.baseHarvest * landFactor * weather * (1 + this.rng.normal(0, p.harvestNoise)));
       const conduct = this.conductOf(v);
       const share = conduct ? chosen(conduct.share, v.beliefShare) : granaryShare(v, p, this.rng);
       v.last.harvest = harvest;
@@ -526,7 +544,7 @@ export class Simulation {
     };
   }
 
-  private measure(births: number, deaths: number): SeasonMetrics {
+  private measure(births: number, deaths: number, drought: boolean): SeasonMetrics {
     const s = this.state;
     const p = s.params;
     const adults = s.villagers.filter((v) => this.isAdult(v));
@@ -545,6 +563,7 @@ export class Simulation {
       meanDisposition: mean(s.villagers.map((v) => v.disposition)),
       meanInfluence: mean(s.villagers.map((v) => v.influence)),
       dispositionBins: bins10(s.villagers.map((v) => v.disposition)),
+      drought,
       sanctions: this.sanctionsThisSeason + this.pondSanctionsThisSeason,
       pondSanctions: this.pondSanctionsThisSeason,
       births,

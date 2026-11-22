@@ -31,6 +31,12 @@ export interface SimParams {
   maxCatch: number;
   /** En dessous de cette fraction de la capacité, l'étang est épuisé. */
   pondDepletedThreshold: number;
+  /** Probabilité, au début de chaque année, qu'une sécheresse commence ; 0 = jamais (fiche 0024). */
+  droughtProbability: number;
+  /** Durée d'une sécheresse, en saisons. */
+  droughtSeasons: number;
+  /** Part de la récolte perdue pendant une sécheresse. */
+  droughtSeverity: number;
 
   // Comportement
   /**
@@ -100,6 +106,9 @@ export const DEFAULT_PARAMS: SimParams = {
   pondGrowth: 0.3,
   maxCatch: 4,
   pondDepletedThreshold: 0.05,
+  droughtProbability: 0,
+  droughtSeasons: 4,
+  droughtSeverity: 0.5,
 
   conditionalSlope: 0.9,
   beliefLearningRate: 0.4,

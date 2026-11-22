@@ -259,6 +259,62 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     status: 'hypothese',
   },
 
+  droughtProbability: {
+    group: 'environment',
+    label: { fr: 'Sécheresses', en: 'Droughts' },
+    help: {
+      fr: 'Probabilité qu’une sécheresse commence au début d’une année. 0 : jamais.',
+      en: 'Probability that a drought starts at the beginning of a year. 0: never.',
+    },
+    unit: PROBA,
+    min: 0,
+    max: 1,
+    step: 0.01,
+    status: 'hypothese',
+    note: {
+      fr: 'Désactivées par défaut : le modèle validé par les faits stylisés n’en a pas. Le prototype d’une vie propose 0,04 par an, environ deux sécheresses dans une vie de 45 ans, pour qu’on en rencontre une ou deux (fiche 0024). Ce n’est pas une fréquence observée.',
+      en: 'Off by default: the model validated by the stylised facts has none. The life prototype offers 0.04 per year, about two droughts in a 45-year life, so that one meets one or two (decision 0024). This is not an observed frequency.',
+    },
+    presets: [
+      { label: { fr: 'Jamais', en: 'Never' }, value: 0 },
+      { label: { fr: 'Parfois (environ deux par vie)', en: 'Sometimes (about two per life)' }, value: 0.04 },
+    ],
+  },
+  droughtSeasons: {
+    group: 'environment',
+    label: { fr: 'Durée d’une sécheresse', en: 'Length of a drought' },
+    help: {
+      fr: 'Nombre de saisons pendant lesquelles les champs donnent moins.',
+      en: 'Number of seasons during which fields yield less.',
+    },
+    unit: SEASONS,
+    min: 1,
+    max: 40,
+    step: 1,
+    status: 'hypothese',
+    note: {
+      fr: 'Une année entière : assez pour qu’une réserve faible ne suffise plus, pas assez pour vider un village (fiche 0024).',
+      en: 'A whole year: long enough for a small reserve to run out, not long enough to empty a village (decision 0024).',
+    },
+  },
+  droughtSeverity: {
+    group: 'environment',
+    label: { fr: 'Force d’une sécheresse', en: 'Strength of a drought' },
+    help: {
+      fr: 'Part de la récolte perdue pendant une sécheresse. 0,5 : les champs donnent moitié moins.',
+      en: 'Share of the harvest lost during a drought. 0.5: fields yield half as much.',
+    },
+    unit: FRACTION,
+    min: 0,
+    max: 1,
+    step: 0.05,
+    status: 'hypothese',
+    note: {
+      fr: 'Moitié moins : une récolte de 10 tombe à 5, sous ce que mange un adulte (8). Ne pas partager ne suffit plus ; il faut puiser dans sa réserve, le grenier ou l’étang (fiche 0024).',
+      en: 'Half as much: a harvest of 10 drops to 5, below what an adult eats (8). Not sharing is no longer enough; one must draw on one’s reserve, the granary or the pond (decision 0024).',
+    },
+  },
+
   // --- Comportement ---
   conditionalSlope: {
     group: 'behavior',

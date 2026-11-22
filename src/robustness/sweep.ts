@@ -18,6 +18,9 @@ export const EXCLUDED: Partial<Record<keyof SimParams, string>> = {
   pondDepletedThreshold: 'sert seulement à l’indicateur « étang épuisé », sans effet sur la simulation',
   observedNeighbors: 'vaut 0 (tout le village) par défaut, et une variation proportionnelle de 0 reste 0 ; à balayer à part si le voisinage devient la règle (fiche 0023)',
   playerStartAge: 'sans effet sur les vérifications, qui se jouent sans joueur',
+  droughtProbability: 'vaut 0 (jamais) par défaut, et une variation proportionnelle de 0 reste 0 (fiche 0024)',
+  droughtSeasons: 'sans effet tant que les sécheresses sont désactivées',
+  droughtSeverity: 'sans effet tant que les sécheresses sont désactivées',
 };
 
 export interface CheckOutcome {

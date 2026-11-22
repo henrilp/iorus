@@ -58,6 +58,12 @@ describe('une vie en texte', () => {
     expect(b).not.toEqual(a);
   });
 
+  test('une sécheresse arrête le temps et demande un choix', () => {
+    const { moments, session } = playLife({ ...settings, params: { ...settings.params, droughtProbability: 0.3 } }, 3);
+    expect(moments).toContain('drought');
+    expect(session.log.some((e) => e.text.includes('Sécheresse'))).toBe(true);
+  });
+
   test('les noms sont stables et distincts', () => {
     const names = new Set(Array.from({ length: 300 }, (_, i) => villagerName(i)));
     expect(names.size).toBe(300);

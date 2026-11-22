@@ -45,7 +45,7 @@ const COMPOSITIONS: Record<string, { label: string; composition: Composition }> 
 let settings: LifeSettings | null = null;
 let session: LifeSession | null = null;
 
-function presetSelect(key: 'pondCapacityPerVillager' | 'observedNeighbors', value: number): HTMLSelectElement {
+function presetSelect(key: 'pondCapacityPerVillager' | 'observedNeighbors' | 'droughtProbability', value: number): HTMLSelectElement {
   const select = el('select', { name: key });
   for (const p of PARAM_SPECS[key].presets ?? []) {
     const option = el('option', { value: String(p.value) }, p.label.fr);
@@ -69,6 +69,8 @@ function renderSetup(): void {
       el('label', {}, 'Population ', compo),
       el('label', {}, `${PARAM_SPECS.pondCapacityPerVillager.label.fr} `, presetSelect('pondCapacityPerVillager', DEFAULT_PARAMS.pondCapacityPerVillager)),
       el('p', { class: 'help' }, 'Avec le grand étang, les poissons se renouvellent assez pour que l’étang ne meure jamais ; avec le petit, un village qui pêche sans retenue peut le vider.'),
+      el('label', {}, `${PARAM_SPECS.droughtProbability.label.fr} `, presetSelect('droughtProbability', PACING.droughtProbability)),
+      el('p', { class: 'help' }, `Une sécheresse dure ${DEFAULT_PARAMS.droughtSeasons} saisons ; les champs donnent ${Math.round(DEFAULT_PARAMS.droughtSeverity * 100)} % de moins. La fréquence proposée est un choix du prototype, pas une fréquence observée.`),
     ),
     el(
       'fieldset',
@@ -92,6 +94,7 @@ function renderSetup(): void {
     const params: Partial<SimParams> = {
       pondCapacityPerVillager: Number(f.get('pondCapacityPerVillager')),
       observedNeighbors: Number(f.get('observedNeighbors')),
+      droughtProbability: Number(f.get('droughtProbability')),
       sanctionsEnabled: f.get('sanctionsEnabled') === 'on',
       pondSanctionsEnabled: f.get('pondSanctionsEnabled') === 'on',
     };
