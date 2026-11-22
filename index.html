@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>I or Us — labo</title>
+    <link rel="stylesheet" href="/src/lab/lab.css" />
+  </head>
+  <body>
+    <main>
+      <aside id="panel">
+        <header>
+          <h1>I or Us — labo</h1>
+          <p class="note">Page de mise au point du moteur, sans graphismes. Tout ce que le moteur utilise est visible ici.</p>
+        </header>
+        <nav role="tablist">
+          <button role="tab" data-tab="simple" aria-selected="true">Réglages</button>
+          <button role="tab" data-tab="params" aria-selected="false">Tous les paramètres</button>
+          <button role="tab" data-tab="rules" aria-selected="false">Règles du moteur</button>
+        </nav>
+
+        <section id="tab-simple" class="tab">
+          <form id="simple">
+            <fieldset>
+              <legend>Village</legend>
+              <label>Villageois au départ <input type="number" name="size" min="5" max="120" value="30" /></label>
+              <label>Graine du hasard <input type="number" name="seed" value="42" /></label>
+              <p class="help">Même graine et mêmes réglages donnent exactement la même partie. Changer la graine rejoue avec un autre tirage.</p>
+              <label>Années simulées <input type="number" name="years" min="1" max="1000" value="200" /></label>
+            </fieldset>
+            <fieldset>
+              <legend>Composition de la population</legend>
+              <label class="check"><input type="radio" name="mode" value="uniform" /> Tous pareils</label>
+              <label class="check"><input type="radio" name="mode" value="twoGroups" checked /> Deux groupes</label>
+              <label class="check"><input type="radio" name="mode" value="mix" /> Mélange au hasard</label>
+              <div data-mode="uniform">
+                <label>Disposition : I ← → Us <output name="o_d">0.5</output><input type="range" name="d" min="0" max="1" step="0.05" value="0.5" /></label>
+                <label>Influençabilité <output name="o_i">0.7</output><input type="range" name="i" min="0" max="1" step="0.05" value="0.7" /></label>
+              </div>
+              <div data-mode="twoGroups">
+                <label>Taille du groupe A <output name="o_shareA">0.15</output><input type="range" name="shareA" min="0" max="1" step="0.05" value="0.15" /></label>
+                <label>Groupe A : disposition I ← → Us <output name="o_dA">0</output><input type="range" name="dA" min="0" max="1" step="0.05" value="0" /></label>
+                <label>Groupe A : influençabilité <output name="o_iA">0</output><input type="range" name="iA" min="0" max="1" step="0.05" value="0" /></label>
+                <label>Groupe B : disposition I ← → Us <output name="o_dB">0.6</output><input type="range" name="dB" min="0" max="1" step="0.05" value="0.6" /></label>
+                <label>Groupe B : influençabilité <output name="o_iB">0.7</output><input type="range" name="iB" min="0" max="1" step="0.05" value="0.7" /></label>
+              </div>
+              <div data-mode="mix">
+                <label>Disposition moyenne I ← → Us <output name="o_mean">0.5</output><input type="range" name="mean" min="0" max="1" step="0.05" value="0.5" /></label>
+                <label>Dispersion de la disposition <output name="o_spread">0.2</output><input type="range" name="spread" min="0" max="0.5" step="0.05" value="0.2" /></label>
+                <label>Influençabilité moyenne <output name="o_iMean">0.7</output><input type="range" name="iMean" min="0" max="1" step="0.05" value="0.7" /></label>
+                <label>Dispersion de l’influençabilité <output name="o_iSpread">0.15</output><input type="range" name="iSpread" min="0" max="0.5" step="0.05" value="0.15" /></label>
+              </div>
+              <p class="help">Deux traits par villageois. La disposition va de 0 (tout pour soi) à 1 (tout pour le groupe) : c’est ce qu’il ferait s’il ne regardait personne. L’influençabilité va de 0 (il ne regarde pas les autres) à 1 (il fait comme il croit que les autres font). Le réglage « deux groupes » par défaut met 15 % de profiteurs insensibles aux autres parmi des villageois plutôt coopératifs et influençables. L’influençabilité par défaut de 0,7 reflète l’observation que la plupart des gens sont des coopérateurs conditionnels (à sourcer).</p>
+            </fieldset>
+            <fieldset>
+              <legend>Règles du village</legend>
+              <div id="simple-sanctions"></div>
+            </fieldset>
+          </form>
+        </section>
+
+        <section id="tab-params" class="tab" hidden></section>
+        <section id="tab-rules" class="tab" hidden></section>
+
+        <footer>
+          <button id="run" class="primary">Lancer la simulation</button>
+        </footer>
+      </aside>
+
+      <section id="results">
+        <p id="summary"></p>
+        <p id="modified" hidden></p>
+        <div id="charts"></div>
+      </section>
+    </main>
+    <script type="module" src="/src/lab/main.ts"></script>
+  </body>
+</html>

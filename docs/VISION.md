@@ -19,7 +19,7 @@ Le jeu cherche à faire réfléchir, jamais à convaincre.
 
 Chaque individu porte deux élans contradictoires : se préserver soi (I) et préserver le groupe (Us). Leur dosage varie d'un individu à l'autre.
 
-Le moteur traduit ce dosage en une **disposition** de départ. Le comportement réel s'ajuste ensuite à ce que l'individu voit autour de lui, car la recherche montre que la plupart des gens sont des **coopérateurs conditionnels** : ils coopèrent tant que les autres coopèrent. C'est précisément ce qui rend le passager clandestin si destructeur : il fait basculer les conditionnels.
+Le moteur traduit ce dosage en une **disposition** : ce que l'individu ferait s'il ne regardait personne. Un second trait, l'**influençabilité**, dit à quel point il règle sa conduite sur celle des autres. La recherche montre que la plupart des gens sont des **coopérateurs conditionnels** : ils coopèrent tant que les autres coopèrent. C'est précisément ce qui rend le passager clandestin si destructeur : il fait basculer les influençables. L'axe I/Us reste central ; l'influençabilité dit seulement à quel point le contexte social module ces instincts.
 
 ## Trois échelles
 

@@ -48,7 +48,7 @@ Règles d'écriture :
 - Jamais de score moral, de pourcentage d'égoïsme ni de mot péjoratif.
 - Chaque trait est situé parmi les comportements observés : « Tu as rendu ce qu'on t'a donné, comme environ la moitié des gens dans les expériences. » Les chiffres affichés doivent venir d'une source vérifiée (voir « Sources » plus bas).
 - Une phrase rappelle que le comportement dépend du contexte et n'est pas une identité figée.
-- Ces mesures deviennent les paramètres du villageois du joueur.
+- Ces mesures deviennent les deux traits du villageois du joueur : la générosité spontanée donne sa disposition, la réciprocité son influençabilité.
 
 ## Le modèle du village
 
@@ -56,7 +56,8 @@ Règles d'écriture :
 
 | Attribut | Description |
 |---|---|
-| `disposition` | Entre 0 (tout pour soi, I) et 1 (tout pour le groupe, Us). Fixée à la naissance. |
+| `disposition` | Entre 0 (tout pour soi, I) et 1 (tout pour le groupe, Us) : ce que le villageois ferait s'il ne regardait personne. Fixée à la naissance, ne bouge ensuite que par imitation. |
+| `influence` | Influençabilité, entre 0 (ne regarde pas les autres) et 1 (règle entièrement sa conduite sur eux). Fixée à la naissance. |
 | `belief` | Ce que le villageois croit que les autres font (moyenne glissante des contributions observées). |
 | `wealth` | Réserve de nourriture. |
 | `age`, `parentId` | Pour les générations et les lignées. |
@@ -64,15 +65,15 @@ Règles d'écriture :
 
 ### Règle de comportement
 
-La disposition donne le comportement de départ ; le comportement réel s'ajuste ensuite à ce que le villageois observe (coopération conditionnelle).
+Deux traits indépendants décident du comportement. La disposition dit ce que le villageois ferait seul ; l'influençabilité dit à quel point il règle sa conduite sur ce qu'il croit que font les autres.
 
-- La part contribuée au grenier vaut `share = a(disposition) + b(disposition) × belief`, bornée entre 0 et 1.
-- Disposition proche de 0 : la part reste proche de 0 quoi que fassent les autres (passager clandestin).
-- Disposition proche de 1 : la part reste élevée quoi que fassent les autres (coopérateur inconditionnel).
-- Disposition intermédiaire : le villageois suit à peu près ce que font les autres, avec un léger biais à la baisse (coopérateur conditionnel). La littérature observe ce biais.
-- La même logique règle la modération à l'étang : plus la disposition est basse et plus les autres surpêchent, plus on pêche.
+- La part versée au grenier vaut `share = (1 − influence) × disposition + influence × conditionalSlope × belief`, bornée entre 0 et 1.
+- `conditionalSlope` (0,9 par défaut) traduit le biais observé : quand on suit les autres, on rend un peu moins que ce qu'on voit.
+- Toutes les combinaisons ont un sens : un égoïste peu influençable est un passager clandestin pur ; un généreux peu influençable est un coopérateur inconditionnel ; un villageois très influençable est un coopérateur conditionnel qui suit le groupe vers le haut comme vers le bas.
+- À influençabilité égale, une disposition plus haute ne donne jamais moins (testé villageois par villageois).
+- La même logique règle la modération à l'étang.
 
-Les fonctions `a` et `b` et le biais sont à calibrer sur les sources.
+Historique : une première version utilisait un seul trait, dont la distance au centre dosait le suivi des autres. Elle faisait parfois donner davantage à un villageois plus égoïste ; le labo l'a révélé et elle a été remplacée par ce modèle à deux traits.
 
 ### Le cycle d'une saison (quatre saisons par an)
 
@@ -86,21 +87,22 @@ Les fonctions `a` et `b` et le biais sont à calibrer sur les sources.
 ### Les générations (une fois par an)
 
 - **Vieillissement et mort** : espérance de vie avec un aléa, mort prématurée en cas de famine prolongée.
-- **Naissances** : un adulte dont la réserve dépasse un seuil a une probabilité d'avoir un enfant. L'enfant hérite de la disposition du parent avec une petite variation aléatoire, et d'une part de sa réserve.
-- **Imitation** : chaque année, un villageois peut rapprocher sa disposition de celle d'un voisin plus prospère (apprentissage social biaisé par la réussite). Seul ce mécanisme fait évoluer une disposition au cours d'une vie.
+- **Naissances** : un adulte dont la réserve dépasse un seuil a une probabilité d'avoir un enfant. L'enfant hérite de la disposition et de l'influençabilité du parent, chacune avec une petite variation aléatoire, et d'une part de sa réserve.
+- **Imitation** : chaque année, un villageois peut rapprocher sa disposition de celle d'un voisin plus prospère (apprentissage social biaisé par la réussite). Seul ce mécanisme fait évoluer une disposition au cours d'une vie. L'influençabilité, elle, n'est pas imitée : elle reste fixe. On distingue ainsi l'influence à court terme (je verse moins cette saison parce que les autres versent peu) de l'influence à long terme (ma disposition change parce que je copie ceux qui réussissent).
 - La population est limitée de fait par la nourriture disponible.
 
 ### Ce que l'on mesure
 
-Population, richesse moyenne, inégalités (indice de Gini), stock de l'étang, part moyenne contribuée au grenier, disposition moyenne, nombre de sanctions.
+Population, richesse moyenne, inégalités (indice de Gini), stock de l'étang, part moyenne contribuée au grenier, disposition et influençabilité moyennes, nombre de sanctions.
 
 ## Réglages du joueur
 
 - **Taille du village** : de 10 à 60 villageois, 30 par défaut.
-- **Composition**, en trois modes :
-  - « Tous pareils » : un curseur I/Us unique.
-  - « Deux groupes » : proportion de chaque groupe et curseur I/Us de chacun.
-  - « Mélange » : moyenne et dispersion.
+- **Composition**, en trois modes, chacun réglant la disposition et l'influençabilité :
+  - « Tous pareils » : un curseur I/Us et un curseur d'influençabilité.
+  - « Deux groupes » : proportion de chaque groupe, et les deux traits de chacun.
+  - « Mélange » : moyenne et dispersion de chaque trait.
+- L'influençabilité par défaut vaut 0,7 : la plupart des gens observés en laboratoire sont des coopérateurs conditionnels (à sourcer).
 - **Inclure mon villageois** : oui par défaut si l'intro a été jouée.
 - **Sanctions entre villageois** : autorisées ou non.
 - **Durée** : nombre de générations (10 par défaut) ou « jusqu'à ce que je m'arrête ».
@@ -111,10 +113,10 @@ Le réglage dit « I/Us » côté joueur. Dans le jeu, aucun libellé politique.
 ## L'écran de simulation
 
 - **Carte en pixel art**, vue de dessus : maisons, champs, grenier, étang. Les villageois marchent vers le champ, le grenier et l'étang selon la saison. Les saisons changent l'apparence.
-- **La disposition n'est pas affichée par défaut.** Un clic sur un villageois ouvre sa fiche : nom, âge, réserve, ce qu'il a fait les dernières saisons, son parent.
+- **Les traits (disposition, influençabilité) ne sont pas affichés par défaut.** Un clic sur un villageois ouvre sa fiche : nom, âge, réserve, ce qu'il a fait les dernières saisons, son parent.
 - **Signes visuels** : niveau du grenier, poissons visibles dans l'étang, maisons vides quand la population baisse, petite icône lors d'une sanction.
 - **Contrôle du temps** : pause, ×1, ×4, ×32, et « passer 10 ans » (calcul sans animation).
-- **Panneau de courbes**, repliable : population, richesse et Gini, stock de l'étang, contribution moyenne, disposition moyenne.
+- **Panneau de courbes**, repliable : population, richesse et Gini, stock de l'étang, contribution moyenne, disposition et influençabilité moyennes.
 - **Lignée du joueur** : un repère discret permet de suivre son villageois puis ses descendants.
 
 ## Fin de partie
@@ -147,16 +149,20 @@ Le fichier `docs/SOURCES.md` (à créer) liste chaque paramètre du moteur avec 
 - **Graphismes** : packs pixel art libres de droits (licence vérifiée et notée dans `assets/LICENSES.md`) ou sprites originaux. Aucun élément repris d'un jeu existant.
 - **Hébergement** : GitHub Pages, déployé par une GitHub Action à chaque push sur `main`.
 
-## Tests du moteur (faits stylisés)
+## Tests du moteur
+
+En plus des faits stylisés ci-dessous, le moteur a des tests de comportement individuel (plus de disposition ne donne jamais moins), de transparence (chaque paramètre apparaît dans une règle affichée) et d'hypothèses de calibrage (choix assumés, séparés des faits observés).
+
+### Faits stylisés
 
 Le moteur doit reproduire qualitativement ces comportements. Chacun est un test Vitest.
 
 1. **Déterminisme** : même graine et mêmes réglages donnent un état identique après 100 saisons.
 2. **Village généreux** : 100 % de dispositions hautes. La contribution reste élevée, l'étang ne s'épuise pas.
-3. **Passager clandestin** : une majorité de conditionnels plus 10 à 20 % de dispositions basses, sans sanctions. La contribution moyenne décline au fil des saisons.
+3. **Passager clandestin** : une majorité de villageois coopératifs et influençables plus 10 à 20 % de profiteurs purs (disposition basse, insensibles aux autres), sans sanctions. La contribution moyenne décline au fil des saisons.
 4. **Sanctions** : même population avec sanctions. La contribution se maintient nettement mieux qu'au test 3.
 5. **Tragédie des communs** : 100 % de dispositions basses. L'étang s'épuise.
-6. **Invasion** : sur plusieurs générations sans sanctions, une petite minorité de dispositions basses progresse dans une population de conditionnels (à confirmer : ce résultat dépend du calibrage, c'est justement ce que le jeu explore).
+6. **Invasion** : sur plusieurs générations sans sanctions, une petite minorité de profiteurs progresse dans une population de coopérateurs influençables (à confirmer : ce résultat dépend du calibrage, c'est justement ce que le jeu explore).
 
 ## À vérifier à la main (recette)
 
