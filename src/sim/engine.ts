@@ -526,9 +526,10 @@ export class Simulation {
   }
 
   /**
-   * Le chef (fiche 0026). À la fin de l'année, si la place est libre (pas encore de chef, chef mort ou mandat fini),
-   * on tire au hasard l'un des trois chemins, et le chef est l'adulte qui l'occupe : le plus âgé, le plus riche,
-   * ou celui qui a versé en moyenne la plus grande part de sa récolte au grenier dans l'année.
+   * Le chef (fiches 0026 et 0027). À la fin de l'année, si la place est libre (pas encore de chef, chef mort ou
+   * mandat fini), on tire au hasard l'un des trois chemins, puis le chef parmi les premiers de ce chemin : les plus
+   * âgés, ceux qui ont le plus gagné dans l'année, ou ceux qui ont versé en moyenne la plus grande part de leur
+   * récolte au grenier dans l'année.
    * Un chef qui n'est pas le joueur décide aussitôt des règles : il autorise chaque domaine de sanctions avec une
    * probabilité égale à sa disposition. Le joueur, lui, décide quand il veut pendant son mandat.
    */
@@ -542,13 +543,19 @@ export class Simulation {
       s.chief = null;
       return;
     }
-    const best = (score: (v: Villager) => number, pool: Villager[]) =>
-      pool.reduce((a, v) => (score(v) > score(a) || (score(v) === score(a) && v.id < a.id) ? v : a));
-    const generous = adults.filter((v) => v.yearSeasons > 0);
+    // Les premiers du chemin, du meilleur au moins bon ; le chef est tiré parmi eux.
+    const best = (score: (v: Villager) => number, pool: Villager[]) => {
+      const ranked = [...pool].sort((a, b) => score(b) - score(a) || a.id - b.id);
+      return this.rng.pick(ranked.slice(0, Math.max(1, p.chiefCandidates)));
+    };
+    // Le revenu et la générosité se mesurent sur l'année : il faut avoir été adulte au moins une saison.
+    const measured = adults.filter((v) => v.yearSeasons > 0);
+    const pool = measured.length > 0 ? measured : adults;
+    const perSeason = (total: number, v: Villager) => (v.yearSeasons > 0 ? total / v.yearSeasons : 0);
     const paths: { path: ChiefPath; pick: () => Villager }[] = [
       { path: 'eldest', pick: () => best((v) => v.ageSeasons, adults) },
-      { path: 'richest', pick: () => best((v) => v.wealth, adults) },
-      { path: 'mostGenerous', pick: () => best((v) => v.yearShare / v.yearSeasons, generous.length > 0 ? generous : adults) },
+      { path: 'highestIncome', pick: () => best((v) => perSeason(v.yearIncome, v), pool) },
+      { path: 'mostGenerous', pick: () => best((v) => perSeason(v.yearShare, v), pool) },
     ];
     const chosen = this.rng.pick(paths);
     const chief = chosen.pick();

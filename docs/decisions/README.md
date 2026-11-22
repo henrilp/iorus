@@ -66,4 +66,5 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0023](0023-voisinage-en-option.md) | Le voisinage, en option : chacun peut n'observer que ses voisins sur l'anneau des maisons | Acceptée |
 | [0024](0024-secheresse-en-option.md) | La sécheresse, en option : une année où les champs donnent moitié moins, tirée de la graine | Acceptée |
 | [0025](0025-nouveaux-venus-en-option.md) | Des nouveaux venus, en option : tirés comme les villageois de départ, sans choix d'accueil | Acceptée |
-| [0026](0026-le-chef.md) | Le chef, en option : trois chemins tirés au hasard, et des règles qui lui survivent | Acceptée |
+| [0026](0026-le-chef.md) | Le chef, en option : trois chemins tirés au hasard, et des règles qui lui survivent | Acceptée, en partie remplacée par 0027 |
+| [0027](0027-chemins-du-chef-equilibres.md) | Les chemins du chef rééquilibrés : le revenu plutôt que la réserve, et un tirage parmi les trois premiers | Acceptée |

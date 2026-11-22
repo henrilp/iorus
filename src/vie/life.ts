@@ -84,11 +84,20 @@ const fmt = (x: number) => num.format(x);
 const sacks = (share: number) => `${Math.round(share * 10)} sac${Math.round(share * 10) > 1 ? 's' : ''} sur 10`;
 const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`;
 
-const CHIEF_PATHS: Record<ChiefPath, string> = {
-  eldest: 'la personne la plus âgée du village',
-  richest: 'la personne la plus riche du village',
-  mostGenerous: 'la personne qui a versé la plus grande part de sa récolte au grenier cette année',
-};
+/** Le chemin par lequel un chef a été choisi, dit en une phrase (k : nombre de candidats par chemin). */
+function chiefPathText(path: ChiefPath, k: number): string {
+  const among = k > 1 ? `parmi les ${k} personnes` : 'la personne';
+  switch (path) {
+    case 'eldest':
+      return k > 1 ? `${among} les plus âgées du village` : 'la personne la plus âgée du village';
+    case 'highestIncome':
+      return k > 1 ? `${among} qui ont le plus gagné cette année` : 'la personne qui a le plus gagné cette année';
+    case 'mostGenerous':
+      return k > 1
+        ? `${among} qui ont versé la plus grande part de leur récolte au grenier cette année`
+        : 'la personne qui a versé la plus grande part de sa récolte au grenier cette année';
+  }
+}
 
 /** Les sanctions autorisées, dites en une phrase. */
 export function rulesText(granary: boolean, pond: boolean): string {
@@ -387,7 +396,7 @@ export class LifeSession {
     const who = this.byId(e.chiefId);
     const name = who ? this.relation(who) : villagerName(e.chiefId);
     const rules = e.rules ? rulesText(e.rules.granary, e.rules.pond) : '';
-    const text = `${name} devient chef : c’est ${CHIEF_PATHS[e.path]}. Désormais, ${rules}.`;
+    const text = `${name} devient chef, par tirage au sort ${chiefPathText(e.path, this.p.chiefCandidates)}. Désormais, ${rules}.`;
     if (this.phase === 'chapter') this.push({ id: 'chief', title: 'Un nouveau chef', lines: [text], choices: [] });
     else this.event(`Quand tu avais ${age} ans, ${text}`);
   }
@@ -647,7 +656,7 @@ export class LifeSession {
         id: 'chief-player',
         title: 'Le village te choisit comme chef',
         lines: [
-          `Tu es ${CHIEF_PATHS[c.path]}. Le village te confie cette place pour ${p.chiefTermYears} ans.`,
+          `Le sort te désigne ${chiefPathText(c.path, p.chiefCandidates)}. Le village te confie cette place pour ${p.chiefTermYears} ans.`,
           `Le chef décide quelles sanctions sont autorisées. Une sanction coûte ${fmt(p.sanctionCost)} à qui la donne et fait perdre ${fmt(p.sanctionFine)} à qui la reçoit ; elle vise qui verse nettement moins que les autres au grenier, ou pêche nettement plus. Aujourd’hui, ${rulesText(p.sanctionsEnabled, p.pondSanctionsEnabled)}.`,
           'Ce que tu décides restera jusqu’au chef suivant, qui décidera à son tour.',
         ],

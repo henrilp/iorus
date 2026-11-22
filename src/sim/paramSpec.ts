@@ -392,13 +392,13 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     group: 'sanctions',
     label: { fr: 'Un chef pour le village', en: 'A chief for the village' },
     help: {
-      fr: 'Le village a un chef, qui décide quelles sanctions sont autorisées. Il est choisi par l’un de trois chemins tiré au hasard : le plus âgé, le plus riche ou le plus généreux au grenier. Les deux options de sanctions ne valent alors qu’au départ.',
-      en: 'The village has a chief, who decides which sanctions are allowed. They are chosen through one of three paths drawn at random: the oldest, the richest or the most generous at the granary. The two sanction options then only apply at the start.',
+      fr: 'Le village a un chef, qui décide quelles sanctions sont autorisées. Il est choisi par l’un de trois chemins tiré au hasard : l’âge, le revenu de l’année ou la générosité au grenier. Les deux options de sanctions ne valent alors qu’au départ.',
+      en: 'The village has a chief, who decides which sanctions are allowed. They are chosen through one of three paths drawn at random: age, the year’s income or generosity at the granary. The two sanction options then only apply at the start.',
     },
     status: 'hypothese',
     note: {
-      fr: 'Désactivé par défaut : les faits stylisés fixent eux-mêmes les sanctions, qu’un chef changerait. Trois chemins tirés au hasard plutôt qu’un seul, pour qu’aucun (la richesse, la générosité, l’âge) ne soit présenté comme la voie vers le pouvoir (fiche 0026).',
-      en: 'Off by default: the stylised facts set the sanctions themselves, which a chief would change. Three paths drawn at random rather than one, so that none (wealth, generosity, age) is presented as the way to power (decision 0026).',
+      fr: 'Désactivé par défaut : les faits stylisés fixent eux-mêmes les sanctions, qu’un chef changerait. Trois chemins tirés au hasard plutôt qu’un seul, pour qu’aucun (le gain, la générosité, l’âge) ne soit présenté comme la voie vers le pouvoir (fiches 0026 et 0027).',
+      en: 'Off by default: the stylised facts set the sanctions themselves, which a chief would change. Three paths drawn at random rather than one, so that none (gain, generosity, age) is presented as the way to power (decisions 0026 and 0027).',
     },
   },
   chiefTermYears: {
@@ -416,6 +416,22 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     note: {
       fr: 'Dix ans : un chapitre de la vie du joueur, assez pour que les règles d’un chef aient le temps d’agir (fiche 0026).',
       en: 'Ten years: one chapter of the player’s life, long enough for a chief’s rules to have time to act (decision 0026).',
+    },
+  },
+  chiefCandidates: {
+    group: 'sanctions',
+    label: { fr: 'Candidats par chemin', en: 'Candidates per path' },
+    help: {
+      fr: 'Le chef est tiré au sort parmi ce nombre de premiers du chemin tiré. 1 : le tout premier.',
+      en: 'The chief is drawn at random among this many top people of the drawn path. 1: the very first.',
+    },
+    min: 1,
+    max: 20,
+    step: 1,
+    status: 'hypothese',
+    note: {
+      fr: 'Trois : avec le seul premier, le joueur qui verse beaucoup devenait chef deux fois plus souvent que les autres, parce qu’une part fixe dépasse presque tous les villageois. Avec les trois premiers et le revenu plutôt que la réserve, celui qui verse beaucoup et celui qui verse presque rien le deviennent à peu près aussi souvent (fiche 0027).',
+      en: 'Three: with only the first, a player who gives a lot became chief twice as often as others, because a fixed share beats almost every villager. With the top three and income rather than reserve, the player who gives a lot and the one who gives almost nothing become chief about as often (decision 0027).',
     },
   },
   pondSanctionsEnabled: {

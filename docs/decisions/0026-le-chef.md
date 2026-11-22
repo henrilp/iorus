@@ -1,6 +1,6 @@
 # 0026. Le chef, en option : trois chemins tirés au hasard, et des règles qui lui survivent
 
-- Statut : Acceptée
+- Statut : Acceptée, en partie remplacée par [0027](0027-chemins-du-chef-equilibres.md)
 - Date : 2026-11-22
 
 ## Contexte

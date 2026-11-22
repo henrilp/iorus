@@ -92,8 +92,8 @@ export type PlayerAction =
   /** Seulement s'il est chef : les sanctions autorisées au village. */
   | { kind: 'rules'; granary: boolean; pond: boolean };
 
-/** Les chemins vers la place de chef (fiche 0026). */
-export type ChiefPath = 'eldest' | 'richest' | 'mostGenerous';
+/** Les chemins vers la place de chef (fiches 0026 et 0027). */
+export type ChiefPath = 'eldest' | 'highestIncome' | 'mostGenerous';
 
 export interface Chief {
   id: number;

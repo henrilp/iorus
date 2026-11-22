@@ -84,9 +84,9 @@ Ils peuvent aussi arriver pendant un chapitre ; entre deux chapitres, ils arrêt
 
 ### Le chef
 
-**17. Un nouveau chef.** Quand la place est libre (mort du chef ou fin de son mandat de 10 ans), le moteur tire l'un de trois chemins (la personne la plus âgée, la plus riche, ou celle qui a versé la plus grande part de sa récolte dans l'année) et le chef est celle qui l'occupe. Récit pendant un chapitre, ligne de la décennie sinon : « Berimi devient chef : c'est la personne la plus âgée du village. Désormais, les sanctions sont autorisées au grenier, pas à l'étang. » Moteur : un chef non joueur autorise chaque sanction avec une probabilité égale à sa disposition (H, [0026](decisions/0026-le-chef.md)).
+**17. Un nouveau chef.** Quand la place est libre (mort du chef ou fin de son mandat de 10 ans), le moteur tire l'un de trois chemins (l'âge, le revenu de l'année, la part de sa récolte versée dans l'année), puis le chef au sort parmi les trois premiers de ce chemin. Récit pendant un chapitre, ligne de la décennie sinon : « Berimi devient chef, par tirage au sort parmi les 3 personnes les plus âgées du village. Désormais, les sanctions sont autorisées au grenier, pas à l'étang. » Moteur : un chef non joueur autorise chaque sanction avec une probabilité égale à sa disposition (H, [0026](decisions/0026-le-chef.md), [0027](decisions/0027-chemins-du-chef-equilibres.md)).
 
-**18. Le village te choisit comme chef.** Carte : le temps s'arrête. « Tu es la personne la plus riche du village. Le village te confie cette place pour 10 ans. » Le jeu rappelle ce que coûte une sanction et ce qui est autorisé aujourd'hui. Choix : sanctions au grenier et à l'étang, au grenier seulement, à l'étang seulement, aucune. Pendant le mandat, le joueur peut changer d'avis depuis le panneau des règles. Moteur : H.
+**18. Le village te choisit comme chef.** Carte : le temps s'arrête. « Le sort te désigne parmi les 3 personnes qui ont le plus gagné cette année. Le village te confie cette place pour 10 ans. » Le jeu rappelle ce que coûte une sanction et ce qui est autorisé aujourd'hui. Choix : sanctions au grenier et à l'étang, au grenier seulement, à l'étang seulement, aucune. Pendant le mandat, le joueur peut changer d'avis depuis le panneau des règles. Moteur : H.
 
 ### Fin de vie
 

@@ -96,6 +96,8 @@ export interface SimParams {
   chiefEnabled: boolean;
   /** Durée du mandat d'un chef, en années. */
   chiefTermYears: number;
+  /** Nombre de premiers du chemin tiré parmi lesquels le chef est tiré au sort. */
+  chiefCandidates: number;
 }
 
 export const DEFAULT_PARAMS: SimParams = {
@@ -149,4 +151,5 @@ export const DEFAULT_PARAMS: SimParams = {
   arrivalSize: 5,
   chiefEnabled: false,
   chiefTermYears: 10,
+  chiefCandidates: 3,
 };
