@@ -52,6 +52,8 @@ Règles d'écriture :
 
 ## Le modèle du village
 
+Cette section donne l'esprit du modèle. Le détail exact (ordre des étapes, formules, valeurs par défaut, statut de chaque paramètre) fait foi dans `src/sim/rules.ts` et `src/sim/paramSpec.ts`, visibles dans le labo ; il n'est pas recopié ici pour ne pas diverger. Les raisons des choix sont dans [docs/decisions/](decisions/README.md).
+
 ### Le villageois
 
 | Attribut | Description |
@@ -73,23 +75,24 @@ Deux traits indépendants décident du comportement. La disposition dit ce que l
 - À influençabilité égale, une disposition plus haute ne donne jamais moins (testé villageois par villageois).
 - La même logique règle la modération à l'étang.
 
-Historique : une première version utilisait un seul trait, dont la distance au centre dosait le suivi des autres. Elle faisait parfois donner davantage à un villageois plus égoïste ; le labo l'a révélé et elle a été remplacée par ce modèle à deux traits.
+Ce modèle à deux traits remplace une première version à un seul trait, qui faisait parfois donner davantage à un villageois plus égoïste : voir les décisions [0004](decisions/0004-comportement-a-un-seul-trait.md) et [0005](decisions/0005-deux-traits-disposition-influencabilite.md).
 
 ### Le cycle d'une saison (quatre saisons par an)
 
 1. **Travail** : chaque adulte produit une récolte (valeur de base plus un léger aléa).
 2. **Grenier** : chacun verse une part de sa récolte au pot commun. Le total est multiplié par `r` (avec 1 < r < nombre de villageois), puis réparti à parts égales entre tous. C'est le dilemme : collectivement on gagne à contribuer, individuellement on gagne à ne pas le faire.
-3. **Étang** : chacun pêche. Le stock se renouvelle selon une croissance logistique (il repousse vite quand il est à mi-niveau, lentement quand il est presque vide ou presque plein). En dessous d'un seuil, l'étang est déclaré épuisé.
-4. **Sanctions** (si l'option est active) : après avoir vu les contributions, un villageois peut payer un coût `k` pour retirer `m` à un villageois qui a peu contribué (rapport de l'ordre de 1 pour 3 dans les expériences, à vérifier). La probabilité de sanctionner dépend de la disposition et de l'écart observé.
-5. **Consommation** : chacun mange une quantité fixe. Une réserve négative affaiblit puis tue le villageois.
+3. **Étang** : chacun pêche. Le stock se renouvelle selon une croissance logistique (il repousse vite quand il est à mi-niveau, lentement quand il est presque vide ou presque plein), plus quelques poissons venus de la rivière, pour qu'un étang laissé en paix puisse renaître. En dessous d'un seuil, l'étang est déclaré épuisé (simple indicateur).
+4. **Sanctions** (si l'option est active) : après avoir vu les contributions, un villageois peut payer un coût pour faire perdre davantage à un villageois qui a versé nettement moins que la moyenne (rapport de l'ordre de 1 pour 3 dans les expériences, à vérifier). L'écart à la moyenne décide qui peut être ciblé ; la probabilité de sanctionner dépend de la disposition du sanctionneur. Les sanctions ne portent que sur le grenier, jamais sur la pêche, et n'agissent sur le comportement que par la peur. Voir la décision [0007](decisions/0007-sanctions-limitees-au-grenier.md).
+5. **Repas** : chaque adulte mange une quantité fixe ; chaque enfant mange sur la réserve de son parent (ou la sienne s'il est orphelin) et ne travaille pas. Une réserve négative est ramenée à zéro (pas de dette) ; plusieurs saisons de faim consécutives tuent.
 6. **Mise à jour des croyances** à partir de ce qui a été observé.
 
 ### Les générations (une fois par an)
 
-- **Vieillissement et mort** : espérance de vie avec un aléa, mort prématurée en cas de famine prolongée.
+- **Vieillissement et mort** : espérance de vie avec un aléa, mort prématurée en cas de famine prolongée. La réserve d'un mort va à ses enfants vivants, sinon elle est perdue.
 - **Naissances** : un adulte dont la réserve dépasse un seuil a une probabilité d'avoir un enfant. L'enfant hérite de la disposition et de l'influençabilité du parent, chacune avec une petite variation aléatoire, et d'une part de sa réserve.
 - **Imitation** : chaque année, un villageois peut rapprocher sa disposition de celle d'un voisin plus prospère (apprentissage social biaisé par la réussite). Seul ce mécanisme fait évoluer une disposition au cours d'une vie. L'influençabilité, elle, n'est pas imitée : elle reste fixe. On distingue ainsi l'influence à court terme (je verse moins cette saison parce que les autres versent peu) de l'influence à long terme (ma disposition change parce que je copie ceux qui réussissent).
-- La population est limitée de fait par la nourriture disponible.
+- La population est limitée de fait par la nourriture disponible et par la capacité des champs.
+- Choix de calibrage : un adulte qui ne partage rien couvre ses besoins avec un petit surplus, le partage en crée un bien plus grand. Voir la décision [0006](decisions/0006-premier-calibrage.md).
 
 ### Ce que l'on mesure
 
@@ -137,7 +140,13 @@ Une page accessible depuis le menu explique chaque règle en une ou deux phrases
 
 ## Sources
 
-Le fichier `docs/SOURCES.md` (à créer) liste chaque paramètre du moteur avec sa valeur, sa source et un statut (« vérifié » ou « à vérifier »). Aucun chiffre n'est affiché au joueur tant que sa source n'est pas vérifiée. Pistes de départ dans [VISION.md](VISION.md).
+Chaque paramètre du moteur porte un statut dans `src/sim/paramSpec.ts` : `source` (vérifié dans une publication), `a-sourcer` (la littérature donne une valeur ou une forme, pas encore vérifiée) ou `hypothese` (choix de conception). Quand une source est vérifiée, on passe le statut à `source` et on met la référence complète dans la note du paramètre. Le fichier `docs/SOURCES.md` initialement prévu n'est plus nécessaire (décision [0003](decisions/0003-transparence-totale-du-moteur.md)).
+
+Tous les paramètres sont visibles avec leur statut. En revanche, aucun chiffre n'est présenté au joueur comme un fait observé (par exemple dans le portrait : « comme la moitié des gens ») tant que sa source n'est pas vérifiée. Pistes de départ dans [VISION.md](VISION.md).
+
+## Le labo
+
+En attendant le jeu, `index.html` est un labo de mise au point du moteur, sans graphismes, publié sur GitHub Pages. Il a trois onglets : les réglages essentiels ; tous les paramètres, avec recherche, valeur par défaut, statut, justification et règles qui les utilisent ; les règles du moteur, dans l'ordre, avec leurs formules et une figure de la règle de comportement. Un bandeau signale tout paramètre modifié par rapport aux valeurs par défaut. Le futur « Comment ça marche ? » du jeu lira les mêmes registres.
 
 ## Technique
 
@@ -145,7 +154,8 @@ Le fichier `docs/SOURCES.md` (à créer) liste chaque paramètre du moteur avec 
 - **Séparation stricte** :
   - `src/sim/` contient le moteur, en TypeScript pur, sans aucun import de Phaser ni du DOM. Il est déterministe : PRNG à graine, même graine et mêmes réglages donnent exactement le même résultat. Il expose `step()` (une saison) et `run(n)` (sans rendu).
   - `src/game/` contient les scènes Phaser (titre, intro, réglage, village, fin) ; elles lisent l'état du moteur sans jamais le modifier directement.
-  - `src/i18n/` contient `fr.json` et `en.json`. Aucun texte en dur dans le code.
+  - `src/i18n/` contiendra `fr.json` et `en.json` pour les textes du jeu. Aucun texte en dur dans le code. Les textes qui décrivent le modèle (paramètres, règles) vivent, eux, dans les registres de `src/sim/`, déjà en français et en anglais.
+  - `src/lab/` contient le labo.
 - **Graphismes** : packs pixel art libres de droits (licence vérifiée et notée dans `assets/LICENSES.md`) ou sprites originaux. Aucun élément repris d'un jeu existant.
 - **Hébergement** : GitHub Pages, déployé par une GitHub Action à chaque push sur `main`.
 

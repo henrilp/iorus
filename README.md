@@ -6,6 +6,9 @@ On règle le mélange de ces deux élans dans la population d'un village, on lan
 
 - [Vision](docs/VISION.md) : le jeu complet, à long terme.
 - [Spec v1](docs/SPEC-v1.md) : la première version jouable, « Le village ».
+- [Décisions](docs/decisions/README.md) : pourquoi le modèle est ainsi et pas autrement.
+- Labo en ligne : https://henrilp.github.io/iorus/
+- Pour les agents IA : [AGENTS.md](AGENTS.md).
 
 ## Développement
 

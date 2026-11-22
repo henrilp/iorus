@@ -1,0 +1,52 @@
+# Décisions
+
+Chaque fiche explique une décision importante : le problème, les options envisagées, ce qui a été choisi et pourquoi, et ce que ça implique. Le code dit ce qui est ; ces fiches disent pourquoi c'est ainsi et pas autrement.
+
+Le format s'inspire des ADR (Architecture Decision Records, Michael Nygard) dans leur variante MADR, qui garde la trace des options écartées. C'est ce qu'un lecteur critique voudra voir.
+
+## Règles
+
+- Une fiche par décision, numérotée dans l'ordre (`NNNN-titre-court.md`).
+- Une fiche acceptée ne se réécrit pas. Seule sa ligne de statut peut changer. Pour changer d'avis, on écrit une nouvelle fiche qui la remplace, et on met à jour le statut de l'ancienne (« Remplacée par NNNN »).
+- La fiche est écrite au moment de la décision, dans le même commit que le changement, et ajoutée à l'index ci-dessous.
+- Quand écrire une fiche : voir [AGENTS.md](../../AGENTS.md).
+
+## Modèle
+
+```markdown
+# NNNN. Titre de la décision
+
+- Statut : Proposée | Acceptée | Remplacée par [NNNN](NNNN-titre.md)
+- Date : AAAA-MM-JJ
+
+## Contexte
+
+Le problème, les contraintes, ce qui a déclenché la décision.
+
+## Options envisagées
+
+1. Option A : ce qu'elle implique, pour et contre.
+2. Option B : …
+
+## Décision
+
+L'option retenue et la raison principale.
+
+## Conséquences
+
+Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
+```
+
+## Index
+
+| N° | Décision | Statut |
+|---|---|---|
+| [0001](0001-fable-sans-etiquette-politique.md) | Une fable sans étiquette politique ni argument d'autorité | Acceptée |
+| [0002](0002-moteur-pur-deterministe.md) | Un moteur pur, déterministe et séparé du rendu | Acceptée |
+| [0003](0003-transparence-totale-du-moteur.md) | Transparence totale du moteur : registres, statuts, aucune constante cachée | Acceptée |
+| [0004](0004-comportement-a-un-seul-trait.md) | Un seul trait I/Us, le suivi des autres dosé par la distance au centre | Remplacée par 0005 |
+| [0005](0005-deux-traits-disposition-influencabilite.md) | Deux traits : disposition et influençabilité | Acceptée |
+| [0006](0006-premier-calibrage.md) | Premier calibrage : survivre sans partager est possible, les enfants coûtent, l'étang peut renaître | Acceptée |
+| [0007](0007-sanctions-limitees-au-grenier.md) | En v1, des sanctions informelles limitées au grenier | Acceptée |
+| [0008](0008-imitation-de-la-reussite.md) | L'imitation copie la réussite, et seulement la disposition | Acceptée |
+| [0009](0009-publication-publique-adresse-anonyme.md) | Dépôt public, signé avec l'adresse anonyme GitHub | Acceptée |
