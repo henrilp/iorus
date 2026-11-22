@@ -219,3 +219,33 @@ describe('sécheresse', () => {
     for (const h of harvests) expect(h).toBeCloseTo(DEFAULT_PARAMS.baseHarvest * 0.5, 12);
   });
 });
+
+describe('nouveaux venus', () => {
+  const base: SimConfig = { ...config, life: undefined, params: {} };
+
+  test('désactivés par défaut : leur nombre ne change rien', () => {
+    const a = new Simulation(base).run(200);
+    const b = new Simulation({ ...base, params: { arrivalSize: 30 } }).run(200);
+    expect(b).toEqual(a);
+    expect(a.every((m) => m.arrivals === 0)).toBe(true);
+  });
+
+  test('ils arrivent en fin d’année, tirés comme les villageois de départ, au bout de l’anneau', () => {
+    const traits = { disposition: 0.3, influence: 0.6 };
+    const sim = new Simulation({ ...base, composition: { mode: 'uniform', ...traits }, params: { arrivalProbability: 1, arrivalSize: 4 } });
+    const before = new Set(sim.state.villagers.map((v) => v.id));
+    const history = sim.run(spy);
+    expect(history.slice(0, -1).every((m) => m.arrivals === 0)).toBe(true);
+    expect(history.at(-1)!.arrivals).toBe(4);
+    const newcomers = sim.state.villagers.filter((v) => !before.has(v.id) && v.parentId === null);
+    expect(newcomers).toHaveLength(4);
+    const maxHome = Math.max(...sim.state.villagers.filter((v) => before.has(v.id)).map((v) => v.home));
+    for (const v of newcomers) {
+      expect(v.disposition).toBe(traits.disposition);
+      expect(v.influence).toBe(traits.influence);
+      expect(v.wealth).toBe(DEFAULT_PARAMS.startingWealth);
+      expect(v.home).toBeGreaterThan(maxHome);
+      expect(isAdult(v, sim.state.params)).toBe(true);
+    }
+  });
+});

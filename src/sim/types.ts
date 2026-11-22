@@ -143,6 +143,8 @@ export interface SeasonMetrics {
   pondSanctions: number;
   births: number;
   deaths: number;
+  /** Nouveaux venus installés à la fin de la saison. */
+  arrivals: number;
 }
 
 export interface SimState {

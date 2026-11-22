@@ -88,6 +88,10 @@ export interface SimParams {
   imitationRate: number;
   /** Âge du villageois du joueur quand il commence sa vie (fiche 0022). */
   playerStartAge: number;
+  /** Probabilité, à la fin de chaque année, que des nouveaux venus s'installent ; 0 = jamais (fiche 0025). */
+  arrivalProbability: number;
+  /** Nombre de nouveaux venus à chaque arrivée. */
+  arrivalSize: number;
 }
 
 export const DEFAULT_PARAMS: SimParams = {
@@ -137,4 +141,6 @@ export const DEFAULT_PARAMS: SimParams = {
   imitationProbability: 0.1,
   imitationRate: 0.3,
   playerStartAge: 15,
+  arrivalProbability: 0,
+  arrivalSize: 5,
 };

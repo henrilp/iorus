@@ -64,9 +64,17 @@ describe('une vie en texte', () => {
     expect(session.log.some((e) => e.text.includes('Sécheresse'))).toBe(true);
   });
 
+  test('des nouveaux venus sont racontés', () => {
+    const { session } = playLife({ ...settings, params: { ...settings.params, arrivalProbability: 0.3 } }, 1);
+    expect(session.log.some((e) => e.text.includes('venues d’ailleurs'))).toBe(true);
+  });
+
   test('les noms sont stables et distincts', () => {
-    const names = new Set(Array.from({ length: 300 }, (_, i) => villagerName(i)));
-    expect(names.size).toBe(300);
+    const names = new Set(Array.from({ length: 1728 }, (_, i) => villagerName(i)));
+    expect(names.size).toBe(1728);
+    // Des identifiants qui se suivent ne partagent pas la même fin de nom.
+    const endings = new Set([100, 101, 102, 103, 104].map((i) => villagerName(i).slice(-2)));
+    expect(endings.size).toBeGreaterThan(1);
     expect(villagerName(5)).toBe(villagerName(5));
   });
 });

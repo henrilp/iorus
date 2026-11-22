@@ -648,6 +648,43 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     step: 0.05,
     status: 'hypothese',
   },
+  arrivalProbability: {
+    group: 'generations',
+    label: { fr: 'Nouveaux venus', en: 'Newcomers' },
+    help: {
+      fr: 'Probabilité, à la fin d’une année, que des gens venus d’ailleurs s’installent au village. 0 : jamais.',
+      en: 'Probability, at the end of a year, that people from elsewhere settle in the village. 0: never.',
+    },
+    unit: PROBA,
+    min: 0,
+    max: 1,
+    step: 0.01,
+    status: 'hypothese',
+    note: {
+      fr: 'Désactivé par défaut : le modèle validé par les faits stylisés n’en a pas. Le prototype d’une vie propose 0,03 par an, une ou deux arrivées dans une vie. Les nouveaux venus sont tirés comme les villageois de départ : le moteur ne leur prête aucun trait particulier (fiche 0025).',
+      en: 'Off by default: the model validated by the stylised facts has none. The life prototype offers 0.03 per year, one or two arrivals in a life. Newcomers are drawn like the starting villagers: the engine gives them no particular trait (decision 0025).',
+    },
+    presets: [
+      { label: { fr: 'Jamais', en: 'Never' }, value: 0 },
+      { label: { fr: 'Parfois (une ou deux fois par vie)', en: 'Sometimes (once or twice per life)' }, value: 0.03 },
+    ],
+  },
+  arrivalSize: {
+    group: 'generations',
+    label: { fr: 'Nombre de nouveaux venus', en: 'Number of newcomers' },
+    help: {
+      fr: 'Combien de personnes s’installent à chaque arrivée.',
+      en: 'How many people settle at each arrival.',
+    },
+    min: 1,
+    max: 50,
+    step: 1,
+    status: 'hypothese',
+    note: {
+      fr: 'Cinq : assez pour qu’on les remarque dans un village de 30 à 90 habitants, sans le changer d’un coup (fiche 0025).',
+      en: 'Five: enough to be noticed in a village of 30 to 90, without changing it at once (decision 0025).',
+    },
+  },
   playerStartAge: {
     group: 'generations',
     label: { fr: 'Âge du joueur au début de sa vie', en: 'Player’s age at the start of their life' },

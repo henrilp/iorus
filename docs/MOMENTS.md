@@ -80,20 +80,22 @@ Ils peuvent aussi arriver pendant un chapitre ; entre deux chapitres, ils arrêt
 
 **15. Sécheresse.** Environ deux fois par vie en moyenne dans le prototype (une chance sur 25 chaque année), tirée de la graine, sans plafond : certaines vies n'en auront pas, d'autres trois. Parle : un voisin. « Mes champs m'ont donné 5 cette saison. D'habitude, c'est autour de 10. » Choix : verser moins, pêcher davantage (l'étang prend le relais, au risque de le vider), verser davantage, ne rien changer. Moteur : une baisse de la récolte pendant quelques saisons, avec sa fréquence, sa durée et sa force au registre (F, [0024](decisions/0024-secheresse-en-option.md)).
 
+**16. Des nouveaux venus.** Une ou deux fois par vie dans le prototype (3 chances sur 100 chaque année), tirée de la graine. Récit pendant un chapitre, ligne de la décennie sinon : « 5 personnes venues d'ailleurs s'installent au bout du village : Mila, Tobe… Comme tout le monde, elles récolteront, verseront au grenier, pêcheront à l'étang et recevront leur part. » Pas de choix : le joueur ne décide pas de leur venue, et le jeu ne dit rien de leurs traits. Moteur : des villageois tirés comme ceux du départ (G, [0025](decisions/0025-nouveaux-venus-en-option.md)).
+
 ### Fin de vie
 
-**16. La mort.** Pendant un chapitre ou entre deux, par la vieillesse ou la faim. Récit : « Tu es mort à 52 ans. Ta réserve, 30, est partagée entre tes 2 enfants. » Puis le temps s'accélère et la chronique de l'après commence. Moteur : existe.
+**17. La mort.** Pendant un chapitre ou entre deux, par la vieillesse ou la faim. Récit : « Ta vie s'arrête à 52 ans. Ta réserve, 30, est partagée entre tes 2 enfants. » Puis le temps s'accélère et la chronique de l'après commence. Moteur : existe.
 
 ## Ce qui reste hors de cette liste
 
 - **Devenir chef**, et installer ou retirer les sanctions. C'est le levier le plus durable d'après 0020, mais on ne sait pas encore comment on devient chef ni qui succède. À laisser hors du premier prototype ; on joue d'abord dans un village dont les sanctions sont fixées au réglage.
-- **L'arrivée d'étrangers.** Si le chef peut les accepter ou non, ou si leur disposition diffère de celle du village, le moment devient un tract. S'il est gardé, les nouveaux venus doivent être tirés comme les villageois de départ, le jeu ne doit rien dire de leurs traits, et le joueur n'a pas de choix à faire sur leur venue. Je proposerais de le laisser hors de la v1.
+- **Décider de l'arrivée de nouveaux venus**, par le chef ou par le village. Le moment 16 n'offre aucun choix : un choix d'accueil, ou des nouveaux venus aux traits différents de ceux du village, en ferait un tract ([0025](decisions/0025-nouveaux-venus-en-option.md)).
 - **Donner à un voisin précis.** Le moteur n'a pas d'échanges à deux. Le moment 9 traduit la scène dans le modèle ; une vraie aide directe demanderait une règle à sourcer.
 - **Léguer au grenier avant de mourir.** Ce serait une manière simple de « laisser des ressources », mais la règle n'existe pas (la réserve va aux enfants ou se perd).
 
 ## Ce que le moteur doit gagner
 
-A à D sont faits ([0022](decisions/0022-le-joueur-conduit-son-villageois.md)) ; E et F le sont en option, désactivés par défaut ([0023](decisions/0023-voisinage-en-option.md), [0024](decisions/0024-secheresse-en-option.md)).
+A à D sont faits ([0022](decisions/0022-le-joueur-conduit-son-villageois.md)) ; E, F et G le sont en option, désactivés par défaut ([0023](decisions/0023-voisinage-en-option.md), [0024](decisions/0024-secheresse-en-option.md), [0025](decisions/0025-nouveaux-venus-en-option.md)).
 
 - **A. Le joueur décide de sa conduite.** Sa part versée et sa modération viennent de sa ligne de conduite ou de ses gestes, pas de la règle de comportement, sans bruit et sans peur. La partie devient : graine, réglages et journal des choix ; rejouer le journal redonne la même partie. Déjà prévu par 0020, avec une fiche à part.
 - **B. Le joueur sanctionne une cible précise**, une fois, aux conditions des autres villageois.
@@ -101,8 +103,9 @@ A à D sont faits ([0022](decisions/0022-le-joueur-conduit-son-villageois.md)) ;
 - **D. Le joueur commence à 15 ans, enfant d'un villageois existant**, au lieu d'arriver jeune adulte (règle `player` actuelle).
 - **E. Le voisinage** : chacun observe ses voisins, pas tout le village. Prévu par 0020, avec sa fiche et la revérification des faits stylisés. Les moments 5, 7 et 9 en dépendent ; sans lui, « tes voisins » voudrait dire « tout le village ».
 - **F. La sécheresse**, nouvelle règle tirée de la graine.
+- **G. Les nouveaux venus**, tirés comme les villageois de départ.
 
-A, B, C et D ne touchent que le villageois du joueur : les faits stylisés, qui se jouent sans joueur, ne bougent pas. E et F changent le modèle de tous. Les chapitres, eux, ne demandent rien au moteur : le jeu décide seulement quand il calcule vite et quand il laisse le joueur agir.
+A, B, C et D ne touchent que le villageois du joueur : les faits stylisés, qui se jouent sans joueur, ne bougent pas. E, F et G changent le modèle de tous. Les chapitres, eux, ne demandent rien au moteur : le jeu décide seulement quand il calcule vite et quand il laisse le joueur agir.
 
 ## Points faibles à garder en tête
 

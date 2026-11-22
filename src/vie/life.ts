@@ -20,6 +20,8 @@ export const PACING = {
   cooldown: { hunger: 8, sanctioned: 8, childOffer: 8, cheater: 4, hungryNeighbor: 4 },
   /** Probabilité annuelle de sécheresse proposée par défaut (paramètre du moteur, désactivé hors du prototype). */
   droughtProbability: 0.04,
+  /** Probabilité annuelle d'arrivée de nouveaux venus proposée par défaut (désactivée hors du prototype). */
+  arrivalProbability: 0.03,
   /** Saisons de suite sous la moyenne avant qu'un voisin soit signalé. */
   cheaterStreak: 2,
   /** Nombre de voisins dont on parle quand le voisinage du moteur est désactivé. */
@@ -292,6 +294,7 @@ export class LifeSession {
     const history = this.sim.state.history;
     this.droughtStarted = !!history.at(-1)?.drought && !history.at(-2)?.drought;
     if (this.droughtStarted && this.phase !== 'chapter') this.event(`Une sécheresse, quand tu avais ${Math.floor(this.ageYears)} ans.`);
+    this.newcomers(before);
     if (this.phase === 'chapter') this.note('season', this.seasonText(v));
     this.sanctionOutcomes();
   }
@@ -330,6 +333,27 @@ export class LifeSession {
       this.recentShares.set(v.id, list);
     }
     for (const id of this.recentShares.keys()) if (!now.has(id)) this.recentShares.delete(id);
+  }
+
+  /** Des gens venus d'ailleurs se sont installés : un récit pendant un chapitre, une ligne de la décennie sinon. */
+  private newcomers(before: Map<number, unknown>): void {
+    if (!this.sim.state.history.at(-1)?.arrivals) return;
+    const names = this.sim.state.villagers.filter((v) => !before.has(v.id) && v.parentId === null).map((v) => villagerName(v.id));
+    if (names.length === 0) return;
+    const age = Math.floor(this.ageYears);
+    if (this.phase !== 'chapter') {
+      this.event(`Quand tu avais ${age} ans, ${names.length} personnes venues d’ailleurs se sont installées au village : ${names.join(', ')}.`);
+      return;
+    }
+    this.push({
+      id: 'arrivals',
+      title: 'Des nouveaux venus',
+      lines: [
+        `${names.length} personnes venues d’ailleurs s’installent au bout du village : ${names.join(', ')}.`,
+        `Comme tout le monde, elles récolteront, verseront au grenier, pêcheront à l’étang et recevront leur part. Le village compte maintenant ${this.sim.state.villagers.length} habitants.`,
+      ],
+      choices: [],
+    });
   }
 
   private readonly knownChildren = new Set<number>();

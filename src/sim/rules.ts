@@ -204,6 +204,17 @@ export const RULES: Rule[] = [
     params: ['imitationProbability', 'imitationRate'],
   },
   {
+    id: 'arrivals',
+    phase: 'year',
+    title: { fr: 'Les nouveaux venus (si l’option est activée)', en: 'Newcomers (if enabled)' },
+    text: {
+      fr: 'À la fin de l’année, des gens venus d’ailleurs peuvent s’installer au village. Ils sont tirés exactement comme les villageois de départ : mêmes traits possibles selon la composition choisie (pour deux profils, chacun est du premier avec la probabilité de sa part), âge tiré entre l’âge adulte et l’âge maximal de départ, réserve de départ, et la croyance que les autres leur ressemblent. Leurs maisons s’ajoutent au bout de l’anneau des maisons. Ensuite, ils suivent les mêmes règles que tout le monde. L’étang ne grandit pas avec eux.',
+      en: 'At the end of the year, people from elsewhere may settle in the village. They are drawn exactly like the starting villagers: the same possible traits according to the chosen composition (for two profiles, each belongs to the first with the probability of its share), age drawn between adulthood and the maximum starting age, the starting reserve, and the belief that others are like them. Their houses are added at the end of the ring of houses. Afterwards they follow the same rules as everyone. The pond does not grow with them.',
+    },
+    formula: 'avec probabilité [arrivalProbability] par an : [arrivalSize] nouveaux venus ; âge ~ uniforme([adultAge], [initialMaxAge]) ; réserve = [startingWealth]',
+    params: ['arrivalProbability', 'arrivalSize', 'adultAge', 'initialMaxAge', 'startingWealth'],
+  },
+  {
     id: 'indicators',
     phase: 'year',
     title: { fr: 'Les indicateurs', en: 'Indicators' },

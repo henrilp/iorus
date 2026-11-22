@@ -37,12 +37,18 @@ export class Simulation {
   private readonly restraints = new Map<number, number>();
   /** Sanction voulue par le joueur pour la saison suivante, au plus une par domaine. */
   private readonly pendingSanctions = new Map<SanctionDomain, number>();
+  /** La composition de départ : les nouveaux venus sont tirés de la même façon (fiche 0025). */
+  private readonly composition: Composition;
+  /** Prochain emplacement libre sur l'anneau des maisons, pour les nouveaux venus. */
+  private nextHome: number;
   /** Ce que le joueur a réellement fait, pour estimer les traits qu'il transmet (fiche 0022). */
   private readonly record = { seasons: 0, share: 0, restraint: 0, neighbors: 0 };
 
   constructor(config: SimConfig) {
     const params: SimParams = { ...DEFAULT_PARAMS, ...config.params };
     this.rng = new Rng(config.seed);
+    this.composition = config.composition;
+    this.nextHome = config.size;
     const pondCapacity = params.pondCapacityPerVillager * config.size;
     this.state = {
       params,
@@ -155,6 +161,7 @@ export class Simulation {
     s.season += 1;
     let deaths = 0;
     let births = 0;
+    let arrivals = 0;
 
     const adults = s.villagers.filter((v) => this.isAdult(v));
     for (const v of s.villagers) v.last = emptyLast();
@@ -199,10 +206,11 @@ export class Simulation {
     if (s.season % p.seasonsPerYear === 0) {
       births += this.reproduce();
       this.imitate();
+      arrivals += this.arrive();
     }
 
     s.extinct = s.villagers.length === 0;
-    const metrics = this.measure(births, deaths, drought);
+    const metrics = this.measure(births, deaths, drought, arrivals);
     s.history.push(metrics);
     return metrics;
   }
@@ -504,6 +512,24 @@ export class Simulation {
     }
   }
 
+  /**
+   * À la fin de l'année, des nouveaux venus peuvent s'installer (fiche 0025). Ils sont tirés exactement comme
+   * les villageois de départ (mêmes traits possibles, mêmes âges, même réserve), et leurs maisons s'ajoutent
+   * au bout de l'anneau. Rien n'est tiré quand la probabilité est nulle : le reste de la partie ne change pas.
+   */
+  private arrive(): number {
+    const s = this.state;
+    const p = s.params;
+    if (p.arrivalProbability <= 0 || s.villagers.length === 0 || !this.rng.chance(p.arrivalProbability)) return 0;
+    for (let i = 0; i < p.arrivalSize; i++) {
+      const v = this.createVillager(drawTraits(this.composition, this.rng), null, this.nextHome++);
+      v.ageSeasons = Math.floor(this.rng.range(p.adultAge, p.initialMaxAge) * p.seasonsPerYear);
+      v.wealth = p.startingWealth;
+      s.villagers.push(v);
+    }
+    return p.arrivalSize;
+  }
+
   // --- Outils ---
 
   private isAdult(v: Villager): boolean {
@@ -544,7 +570,7 @@ export class Simulation {
     };
   }
 
-  private measure(births: number, deaths: number, drought: boolean): SeasonMetrics {
+  private measure(births: number, deaths: number, drought: boolean, arrivals: number): SeasonMetrics {
     const s = this.state;
     const p = s.params;
     const adults = s.villagers.filter((v) => this.isAdult(v));
@@ -568,6 +594,7 @@ export class Simulation {
       pondSanctions: this.pondSanctionsThisSeason,
       births,
       deaths,
+      arrivals,
     };
   }
 }
@@ -597,6 +624,24 @@ export function isAdult(v: Villager, p: SimParams): boolean {
 }
 
 const clampTraits = (t: Traits): Traits => ({ disposition: clamp01(t.disposition), influence: clamp01(t.influence) });
+
+/**
+ * Les traits d'un nouveau venu, tirés comme ceux du village de départ. Pour deux profils, il est du premier
+ * avec la probabilité de sa part (au départ, la part est exacte ; ici, elle est en moyenne).
+ */
+function drawTraits(c: Composition, rng: Rng): Traits {
+  switch (c.mode) {
+    case 'uniform':
+      return clampTraits(c);
+    case 'twoGroups':
+      return clampTraits(rng.chance(clamp01(c.shareA)) ? c.groupA : c.groupB);
+    case 'mix':
+      return clampTraits({
+        disposition: rng.normal(c.mean.disposition, c.spread.disposition),
+        influence: rng.normal(c.mean.influence, c.spread.influence),
+      });
+  }
+}
 
 function initialTraits(c: Composition, size: number, rng: Rng): Traits[] {
   switch (c.mode) {
