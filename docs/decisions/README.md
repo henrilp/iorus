@@ -48,9 +48,13 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0005](0005-deux-traits-disposition-influencabilite.md) | Deux traits : disposition et influençabilité | Acceptée |
 | [0006](0006-premier-calibrage.md) | Premier calibrage : survivre sans partager est possible, les enfants coûtent, l'étang peut renaître | Acceptée, en partie remplacée par 0010 |
 | [0007](0007-sanctions-limitees-au-grenier.md) | En v1, des sanctions informelles limitées au grenier | Acceptée, en partie remplacée par 0011 |
-| [0008](0008-imitation-de-la-reussite.md) | L'imitation copie la réussite, et seulement la disposition | Acceptée |
+| [0008](0008-imitation-de-la-reussite.md) | L'imitation copie la réussite, et seulement la disposition | Acceptée, en partie remplacée par 0014 |
 | [0009](0009-publication-publique-adresse-anonyme.md) | Dépôt public, signé avec l'adresse anonyme GitHub | Acceptée |
 | [0010](0010-peche-de-schaefer.md) | La pêche suit le modèle de Schaefer | Acceptée |
 | [0011](0011-sanctions-de-la-surpeche.md) | Sanctions contre la surpêche, sur le modèle de celles du grenier | Acceptée |
 | [0012](0012-mesures-honnetes.md) | Des mesures qui ne trompent pas : revenus et patrimoine, répartition, profils | Acceptée |
 | [0013](0013-outil-de-robustesse.md) | Un outil de robustesse : chaque fait est revérifié quand on fait varier les paramètres | Acceptée |
+| [0014](0014-imitation-du-revenu.md) | L'imitation compare les revenus, pas les réserves | Acceptée |
+| [0015](0015-modele-v1-fige.md) | Le modèle de la v1 est figé : ce qui reste, ce qui est reporté | Acceptée |
+| [0016](0016-taille-de-l-etang-au-choix.md) | La taille de l'étang est un réglage du joueur : grand ou petit | Acceptée |
+| [0017](0017-premieres-sources-verifiees.md) | Premières sources vérifiées : les chiffres de l'intro et quatre paramètres | Acceptée |

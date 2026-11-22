@@ -193,10 +193,10 @@ export const RULES: Rule[] = [
     phase: 'year',
     title: { fr: 'L’imitation', en: 'Imitation' },
     text: {
-      fr: 'Un adulte peut se comparer à un autre adulte tiré au hasard. Si l’autre est plus riche, il rapproche sa disposition de la sienne. C’est le seul moyen pour une disposition de changer au cours d’une vie ; l’influençabilité, elle, reste fixe. Ce mécanisme imite la réussite, pas la vertu : si les profiteurs s’enrichissent, on les imite.',
-      en: 'An adult may compare themselves with another randomly drawn adult. If the other is richer, they move their disposition towards theirs. This is the only way a disposition changes during a lifetime; susceptibility to influence stays fixed. This mechanism imitates success, not virtue: if free riders get rich, they are imitated.',
+      fr: 'Un adulte peut se comparer à un autre adulte tiré au hasard. Si l’autre a gagné plus que lui cette année, il rapproche sa disposition de la sienne. On compare ce que chacun gagne, pas ce qu’il a amassé, qui dépend surtout de l’âge et de l’héritage. C’est le seul moyen pour une disposition de changer au cours d’une vie ; l’influençabilité, elle, reste fixe. Ce mécanisme imite la réussite, pas la vertu : si les profiteurs gagnent plus, on les imite.',
+      en: 'An adult may compare themselves with another randomly drawn adult. If the other earned more than them this year, they move their disposition towards theirs. What each earns is compared, not what they have amassed, which mostly depends on age and inheritance. This is the only way a disposition changes during a lifetime; susceptibility to influence stays fixed. This mechanism imitates success, not virtue: if free riders earn more, they are imitated.',
     },
-    formula: 'avec probabilité [imitationProbability] : si le modèle est plus riche, disposition += [imitationRate] × (disposition du modèle − disposition)',
+    formula: 'revenu = revenus de l’année (récolte gardée + part du grenier + pêche − sanctions) ÷ saisons passées adulte ; avec probabilité [imitationProbability] : si revenu du modèle > le sien, disposition += [imitationRate] × (disposition du modèle − disposition) ; puis les revenus de l’année repartent de zéro',
     params: ['imitationProbability', 'imitationRate'],
   },
   {

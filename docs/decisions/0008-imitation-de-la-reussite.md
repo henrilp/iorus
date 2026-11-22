@@ -1,6 +1,6 @@
 # 0008. L'imitation copie la réussite, et seulement la disposition
 
-- Statut : Acceptée
+- Statut : Acceptée ; en partie remplacée par [0014](0014-imitation-du-revenu.md) (la réussite se mesure au revenu, pas à la réserve)
 - Date : 2026-11-22
 
 ## Contexte

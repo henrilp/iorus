@@ -46,7 +46,7 @@ Le jeu décrit le joueur selon quatre dimensions : générosité spontanée, ré
 Règles d'écriture :
 
 - Jamais de score moral, de pourcentage d'égoïsme ni de mot péjoratif.
-- Chaque trait est situé parmi les comportements observés : « Tu as rendu ce qu'on t'a donné, comme environ la moitié des gens dans les expériences. » Les chiffres affichés doivent venir d'une source vérifiée (voir « Sources » plus bas).
+- Chaque trait est situé parmi les comportements observés, par exemple : « Tu as ajusté ta part à celle des autres, comme environ la moitié des gens dans les expériences. » Les chiffres affichés viennent des entrées vérifiées de `src/sources/observed.ts` (voir « Sources » plus bas). Attention : la coopération conditionnelle porte sur un pot commun, pas sur le fait de rendre à quelqu'un ce qu'il a donné.
 - Une phrase rappelle que le comportement dépend du contexte et n'est pas une identité figée.
 - Ces mesures deviennent les deux traits du villageois du joueur : la générosité spontanée donne sa disposition, la réciprocité son influençabilité.
 
@@ -90,7 +90,7 @@ Ce modèle à deux traits remplace une première version à un seul trait, qui f
 
 - **Vieillissement et mort** : espérance de vie avec un aléa, mort prématurée en cas de famine prolongée. La réserve d'un mort va à ses enfants vivants, sinon elle est perdue.
 - **Naissances** : un adulte dont la réserve dépasse un seuil a une probabilité d'avoir un enfant. L'enfant hérite de la disposition et de l'influençabilité du parent, chacune avec une petite variation aléatoire, et d'une part de sa réserve.
-- **Imitation** : chaque année, un villageois peut rapprocher sa disposition de celle d'un voisin plus prospère (apprentissage social biaisé par la réussite). Seul ce mécanisme fait évoluer une disposition au cours d'une vie. L'influençabilité, elle, n'est pas imitée : elle reste fixe. On distingue ainsi l'influence à court terme (je verse moins cette saison parce que les autres versent peu) de l'influence à long terme (ma disposition change parce que je copie ceux qui réussissent).
+- **Imitation** : chaque année, un villageois peut rapprocher sa disposition de celle d'un voisin qui a gagné davantage au cours de l'année (apprentissage social biaisé par la réussite). La réussite se mesure au revenu, pas à la réserve, qui reflète surtout l'âge et l'héritage (voir [0014](decisions/0014-imitation-du-revenu.md)). Seul ce mécanisme fait évoluer une disposition au cours d'une vie. L'influençabilité, elle, n'est pas imitée : elle reste fixe. On distingue ainsi l'influence à court terme (je verse moins cette saison parce que les autres versent peu) de l'influence à long terme (ma disposition change parce que je copie ceux qui réussissent).
 - La population est limitée de fait par la nourriture disponible et par la capacité des champs.
 - Choix de calibrage : un adulte qui ne partage rien couvre ses besoins avec un petit surplus, le partage en crée un bien plus grand. Voir la décision [0006](decisions/0006-premier-calibrage.md).
 
@@ -106,6 +106,7 @@ Population, richesse moyenne, inégalités de revenu et de patrimoine (indice de
   - « Deux profils de départ » : part de chaque profil, et les deux traits de chacun. Ce ne sont pas des groupes : personne ne sait à quel profil appartient l'autre, et les profils se mélangent dès la première génération.
   - « Mélange » : moyenne et dispersion de chaque trait.
 - L'influençabilité par défaut vaut 0,7 : la plupart des gens observés en laboratoire sont des coopérateurs conditionnels (à sourcer).
+- **L'étang** : grand ou petit. Avec le grand, l'étang ne meurt jamais ; avec le petit, un village qui pêche sans retenue peut le vider, des villageois qui se modèrent le gardent. Voir la décision [0016](decisions/0016-taille-de-l-etang-au-choix.md).
 - **Inclure mon villageois** : oui par défaut si l'intro a été jouée.
 - **Sanctions entre villageois** : pour le grenier et contre la surpêche, chacune autorisée ou non.
 - **Durée** : nombre de générations (10 par défaut) ou « jusqu'à ce que je m'arrête ».
@@ -142,7 +143,7 @@ Une page accessible depuis le menu explique chaque règle en une ou deux phrases
 
 Chaque paramètre du moteur porte un statut dans `src/sim/paramSpec.ts` : `source` (vérifié dans une publication), `a-sourcer` (la littérature donne une valeur ou une forme, pas encore vérifiée) ou `hypothese` (choix de conception). Quand une source est vérifiée, on passe le statut à `source` et on met la référence complète dans la note du paramètre. Le fichier `docs/SOURCES.md` initialement prévu n'est plus nécessaire (décision [0003](decisions/0003-transparence-totale-du-moteur.md)).
 
-Tous les paramètres sont visibles avec leur statut. En revanche, aucun chiffre n'est présenté au joueur comme un fait observé (par exemple dans le portrait : « comme la moitié des gens ») tant que sa source n'est pas vérifiée. Pistes de départ dans [VISION.md](VISION.md).
+Tous les paramètres sont visibles avec leur statut. En revanche, aucun chiffre n'est présenté au joueur comme un fait observé (par exemple dans le portrait : « comme la moitié des gens ») tant que sa source n'est pas vérifiée. Les faits observés que le jeu peut afficher sont rangés dans `src/sources/observed.ts`, avec la référence, l'endroit dans la source, une citation et un statut ; le jeu n'affiche que les entrées vérifiées (décision [0017](decisions/0017-premieres-sources-verifiees.md)). Pistes de départ dans [VISION.md](VISION.md).
 
 ## Le labo
 
@@ -191,8 +192,8 @@ Un fait reproduit avec les valeurs par défaut ne dit pas grand-chose si ces val
 
 ## Questions ouvertes
 
+- Ce qui reste à faire dans le modèle et ce qui est reporté après la première version jouable : voir la décision [0015](decisions/0015-modele-v1-fige.md).
 - Les noms des quatre traits du portrait et leur formulation exacte, en français et en anglais.
 - Les valeurs par défaut de `r`, `k`, `m`, de la croissance de l'étang et de l'espérance de vie (à calibrer, puis à régler pour qu'une partie de 10 générations reste lisible).
-- Imitation et héritage ensemble dès la v1, ou un seul des deux ?
 - Le villageois du joueur est-il repérable par défaut, ou seulement sur demande ?
 - Le choix du pack graphique.

@@ -5,7 +5,7 @@
 import { DEFAULT_PARAMS, PARAM_SPECS, Simulation, type Composition } from '../sim';
 import { createCharts } from './charts';
 import { selectTab, type TabId } from './nav';
-import { createParamInput, renderParamsPanel } from './paramsPanel';
+import { createParamInput, createPresetSelect, renderParamsPanel } from './paramsPanel';
 import { renderRulesPanel } from './rulesPanel';
 import { PARAM_KEYS, formatValue, isModified, onParamChange, params, t } from './state';
 
@@ -35,6 +35,15 @@ const pondSanctionsHelp = document.createElement('p');
 pondSanctionsHelp.className = 'help';
 pondSanctionsHelp.textContent = t(PARAM_SPECS.pondSanctionsEnabled.help);
 document.querySelector('#simple-sanctions')!.append(sanctionsLabel, sanctionsHelp, pondSanctionsLabel, pondSanctionsHelp);
+
+// La taille de l'étang, parmi les valeurs proposées au joueur.
+const pondLabel = document.createElement('label');
+pondLabel.append(`${t(PARAM_SPECS.pondCapacityPerVillager.label)} `, createPresetSelect('pondCapacityPerVillager'));
+const pondHelp = document.createElement('p');
+pondHelp.className = 'help';
+pondHelp.textContent =
+  'Avec le grand étang, les poissons se renouvellent assez pour que l’étang ne meure jamais. Avec le petit, un village qui pêche sans retenue peut le vider ; des villageois qui se modèrent le gardent.';
+document.querySelector('#simple-pond')!.append(pondLabel, pondHelp);
 
 // Réglages simples
 function num(name: string): number {

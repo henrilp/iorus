@@ -32,6 +32,11 @@ export interface ParamSpec {
   status: ParamStatus;
   /** Justification du choix, ou piste de source. */
   note?: Text;
+  /**
+   * Valeurs proposées au joueur dans les réglages simples, parmi lesquelles la valeur par défaut.
+   * Le paramètre reste réglable librement dans le labo.
+   */
+  presets?: { label: Text; value: number }[];
 }
 
 export const GROUPS: { id: ParamGroup; label: Text }[] = [
@@ -128,10 +133,10 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     min: 1,
     max: 5,
     step: 0.1,
-    status: 'a-sourcer',
+    status: 'source',
     note: {
-      fr: '1,6 est une valeur classique des expériences de biens publics à 4 joueurs (chacun récupère 0,4 de ce qu’il verse). Ici, avec 30 adultes, chacun ne récupère que 1,6/30 de son propre versement : le dilemme est beaucoup plus fort qu’en laboratoire.',
-      en: '1.6 is a classic value in 4-player public goods experiments (each gets back 0.4 of what they contribute). Here, with 30 adults, each gets back only 1.6/30 of their own contribution: the dilemma is much stronger than in the lab.',
+      fr: '1,6 est la valeur de l’expérience de référence : groupes de 4, chacun récupère 0,4 de ce qu’il verse (Fehr et Gächter, 2000, American Economic Review 90(4), p. 980–994). Ici, avec 30 adultes ou plus, chacun ne récupère que 1,6/30 de son propre versement : le dilemme est beaucoup plus fort qu’en laboratoire.',
+      en: '1.6 is the value of the reference experiment: groups of 4, each gets back 0.4 of what they contribute (Fehr and Gächter, 2000, American Economic Review 90(4), pp. 980–994). Here, with 30 adults or more, each gets back only 1.6/30 of their own contribution: the dilemma is much stronger than in the lab.',
     },
   },
   consumption: {
@@ -201,6 +206,14 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     max: 500,
     step: 5,
     status: 'hypothese',
+    presets: [
+      { label: { fr: 'Grand étang', en: 'Large pond' }, value: 50 },
+      { label: { fr: 'Petit étang', en: 'Small pond' }, value: 20 },
+    ],
+    note: {
+      fr: 'Aucune source : la taille de l’étang est un choix de scénario, laissé au joueur. Ce qui décide si l’étang peut s’éteindre est le rapport croissance × taille ÷ pêche maximale, comparé à la taille que le village atteint. Avec le grand étang (50), il ne s’éteint dans aucun des villages testés. Avec le petit étang (20), un village d’égoïstes ou une minorité de 15 % de profiteurs l’épuise, alors que des villageois coopératifs le gardent entre un tiers et deux tiers de sa capacité : l’extinction y vient des comportements, pas des chiffres. Voir les décisions 0013 et 0016.',
+      en: 'No source: pond size is a scenario choice left to the player. What decides whether the pond can die out is the ratio growth × size ÷ maximum catch, compared with the size the village reaches. With the large pond (50), it dies out in none of the villages tested. With the small pond (20), a village of egoists or a 15% minority of free riders depletes it, while cooperative villagers keep it between a third and two thirds of its capacity: there, extinction comes from behaviour, not from the numbers. See decisions 0013 and 0016.',
+    },
   },
   pondGrowth: {
     group: 'environment',
@@ -257,10 +270,10 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     min: 0,
     max: 1.5,
     step: 0.05,
-    status: 'a-sourcer',
+    status: 'hypothese',
     note: {
-      fr: 'Fischbacher, Gächter et Fehr (2001) observent que la plupart des participants contribuent en fonction des autres, mais un peu moins qu’eux (biais intéressé). Valeur à vérifier.',
-      en: 'Fischbacher, Gächter and Fehr (2001) find that most participants contribute according to others, but a little less (self-serving bias). Value to be checked.',
+      fr: 'La forme est sourcée, la valeur non. Fischbacher et Gächter (2010, American Economic Review 100(1), p. 550 et 554) observent que la plupart des gens contribuent en fonction des autres mais un peu moins qu’eux (« sous la diagonale »). La pente moyenne qu’ils mesurent, tous profils confondus, passagers clandestins compris, est de 0,425 (p. 552). Ici, la pente ne s’applique qu’à la part influencée du comportement, les profiteurs étant représentés par une disposition basse : elle n’est donc pas directement comparable. 0,9 décrit des suiveurs plutôt fidèles ; aucune source ne donne la pente des seuls coopérateurs conditionnels. Avec 0,675, le village généreux verse nettement moins (voir la décision 0017).',
+      en: 'The shape is sourced, the value is not. Fischbacher and Gächter (2010, American Economic Review 100(1), pp. 550 and 554) observe that most people contribute according to others but a little less than them (“below the diagonal”). The average slope they measure across all profiles, free riders included, is 0.425 (p. 552). Here, the slope applies only to the influenced part of behaviour, free riders being represented by a low disposition, so it is not directly comparable. 0.9 describes fairly faithful followers; no source gives the slope of conditional cooperators alone. With 0.675, the generous village contributes markedly less (see decision 0017).',
     },
   },
   beliefLearningRate: {
@@ -322,10 +335,10 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     min: 0,
     max: 20,
     step: 0.5,
-    status: 'a-sourcer',
+    status: 'hypothese',
     note: {
-      fr: 'Le rapport 1 pour 3 entre coût et perte vient des expériences de Fehr et Gächter (2000, 2002). À vérifier.',
-      en: 'The 1-to-3 ratio between cost and fine comes from Fehr and Gächter’s experiments (2000, 2002). To be checked.',
+      fr: 'L’échelle est un choix : une sanction coûte une unité de nourriture, soit un dixième d’une récolte. Le rapport avec la perte infligée, lui, est sourcé (voir la perte infligée).',
+      en: 'The scale is a choice: a sanction costs one unit of food, a tenth of a harvest. Its ratio to the loss inflicted is sourced (see the loss inflicted).',
     },
   },
   sanctionFine: {
@@ -339,10 +352,10 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     min: 0,
     max: 50,
     step: 0.5,
-    status: 'a-sourcer',
+    status: 'source',
     note: {
-      fr: 'Voir le coût d’une sanction.',
-      en: 'See cost of a sanction.',
+      fr: 'Trois fois le coût payé par celui qui sanctionne, comme dans Fehr et Gächter (2002, Nature 415, p. 137) : « Each point assigned cost the punished member 3 MUs and the punishing member 1 MU ».',
+      en: 'Three times the cost paid by the punisher, as in Fehr and Gächter (2002, Nature 415, p. 137): “Each point assigned cost the punished member 3 MUs and the punishing member 1 MU”.',
     },
   },
   sanctionGap: {
@@ -536,8 +549,8 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     group: 'generations',
     label: { fr: 'Probabilité d’imiter', en: 'Imitation probability' },
     help: {
-      fr: 'Chaque année, probabilité qu’un adulte se compare à un autre adulte tiré au hasard, et rapproche sa disposition de la sienne s’il est plus riche que lui. L’influençabilité n’est pas imitée.',
-      en: 'Each year, probability that an adult compares themselves with another randomly drawn adult, and moves their disposition towards theirs if they are richer. Susceptibility to influence is not imitated.',
+      fr: 'Chaque année, probabilité qu’un adulte se compare à un autre adulte tiré au hasard, et rapproche sa disposition de la sienne si celui-ci a gagné davantage au cours de l’année. L’influençabilité n’est pas imitée.',
+      en: 'Each year, probability that an adult compares themselves with another randomly drawn adult, and moves their disposition towards theirs if the other earned more over the year. Susceptibility to influence is not imitated.',
     },
     unit: PROBA,
     min: 0,

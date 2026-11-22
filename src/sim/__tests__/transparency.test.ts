@@ -33,4 +33,17 @@ describe('transparence', () => {
       if (spec.max !== undefined) expect(value, k).toBeLessThanOrEqual(spec.max);
     }
   });
+
+  test('les valeurs proposées au joueur sont dans les bornes et comprennent la valeur par défaut', () => {
+    for (const k of keys) {
+      const presets = PARAM_SPECS[k].presets;
+      if (!presets) continue;
+      const spec = PARAM_SPECS[k];
+      expect(presets.map((p) => p.value), k).toContain(DEFAULT_PARAMS[k]);
+      for (const { value } of presets) {
+        if (spec.min !== undefined) expect(value, k).toBeGreaterThanOrEqual(spec.min);
+        if (spec.max !== undefined) expect(value, k).toBeLessThanOrEqual(spec.max);
+      }
+    }
+  });
 });

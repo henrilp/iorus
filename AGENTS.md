@@ -18,7 +18,7 @@ Il en existe aujourd'hui le moteur de simulation (`src/sim/`), un outil de robus
 ## Principes non négociables
 
 - **Fable, pas tract.** Aucune étiquette politique dans le jeu ni dans ses textes (pas de gauche, droite, libéral, etc.). Les villageois ont des comportements, pas des opinions. Pas de victoire, pas de morale : des conséquences et des questions. Voir [0001](docs/decisions/0001-fable-sans-etiquette-politique.md).
-- **Pas d'argument d'autorité.** Les sources sont consultables, jamais brandies. Aucun chiffre n'est présenté au joueur comme un fait observé tant que sa source n'est pas vérifiée.
+- **Pas d'argument d'autorité.** Les sources sont consultables, jamais brandies. Aucun chiffre n'est présenté au joueur comme un fait observé tant que sa source n'est pas vérifiée : les textes du jeu ne citent que les entrées vérifiées de `src/sources/observed.ts`.
 - **Transparence totale du moteur.** Voir [0003](docs/decisions/0003-transparence-totale-du-moteur.md).
   - Aucune constante cachée : tout nombre qui influence la simulation est un paramètre de `src/sim/params.ts`, décrit dans `src/sim/paramSpec.ts` (rôle, unité, bornes, statut `source` / `a-sourcer` / `hypothese`, justification).
   - Tout comportement du moteur est décrit dans `src/sim/rules.ts`, dans l'ordre d'exécution, avec sa formule. Modifier `engine.ts` ou `behavior.ts` sans mettre à jour `rules.ts` dans le même commit est une erreur.

@@ -24,6 +24,10 @@ export interface Villager {
   /** Âge (en années) auquel il mourra de vieillesse. */
   lifespanYears: number;
   hungerSeasons: number;
+  /** Revenu cumulé depuis le début de l'année (récolte gardée, part du grenier, pêche, sanctions). Remis à zéro après l'imitation. */
+  yearIncome: number;
+  /** Saisons passées adulte depuis le début de l'année, pour ramener le revenu à une moyenne par saison. */
+  yearSeasons: number;
   parentId: number | null;
   isPlayer: boolean;
   /** Dernière saison : ce qu'il a fait (pour la fiche et le rendu). */

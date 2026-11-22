@@ -46,6 +46,25 @@ export function createParamInput(key: keyof SimParams): HTMLInputElement {
   return input;
 }
 
+/** Choix parmi les valeurs proposées d'un paramètre, lié au même paramètre que le panneau complet. */
+export function createPresetSelect(key: keyof SimParams): HTMLSelectElement {
+  const presets = PARAM_SPECS[key].presets ?? [];
+  const select = document.createElement('select');
+  select.name = `preset-${key}`;
+  for (const p of presets) select.append(new Option(`${t(p.label)} (${formatValue(p.value)})`, String(p.value)));
+  const other = new Option('Autre valeur (onglet Paramètres)', '');
+  other.disabled = true;
+  select.append(other);
+  const sync = () => {
+    const match = presets.find((p) => p.value === params[key]);
+    select.value = match ? String(match.value) : '';
+  };
+  select.addEventListener('change', () => select.value && setParam(key, Number(select.value) as never));
+  onParamChange((changed) => changed === key && sync());
+  sync();
+  return select;
+}
+
 export function renderParamsPanel(container: HTMLElement): void {
   const intro = el('div', 'params-intro');
   intro.append(
@@ -171,6 +190,10 @@ function renderParam(key: keyof SimParams): HTMLElement {
   meta.append(reset);
 
   card.append(head, meta, el('p', 'help', t(spec.help)));
+  if (spec.presets) {
+    const list = spec.presets.map((p) => `${t(p.label)} (${formatValue(p.value)})`).join(', ');
+    card.append(el('p', 'help', `Valeurs proposées dans les réglages : ${list}.`));
+  }
 
   if (spec.note) {
     const details = el('details');

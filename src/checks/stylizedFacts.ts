@@ -38,6 +38,7 @@ export const STYLIZED_FACTS: Check[] = [
   {
     id: 'passager-clandestin',
     title: 'passager clandestin : sans sanction, la contribution décline au fil des saisons',
+    basis: 'Fehr et Gächter (2000, Tableau 3 ; 2002, p. 138), voir src/sources/observed.ts',
     run: (ctx) => {
       const runs = ctx.runs({ size: SIZE, composition: FREE_RIDERS }, 10);
       const start = avgOver(runs, 'meanShare', 0, 4);
@@ -48,6 +49,7 @@ export const STYLIZED_FACTS: Check[] = [
   {
     id: 'sanctions',
     title: 'sanctions : la contribution se maintient nettement mieux',
+    basis: 'Fehr et Gächter (2000, Tableau 3 ; 2002, p. 138)',
     run: (ctx) => {
       const without = ctx.runs({ size: SIZE, composition: FREE_RIDERS }, 10);
       const withSanctions = ctx.runs({ size: SIZE, composition: FREE_RIDERS, params: { sanctionsEnabled: true } }, 10);
@@ -90,8 +92,9 @@ export const STYLIZED_FACTS: Check[] = [
   {
     id: 'sanctions-surpeche',
     title: 'sanctions de la surpêche : l’étang est mieux préservé',
-    // Ostrom, Walker et Gardner (1992, à vérifier) : la possibilité de sanctionner réduit la surexploitation d'une ressource commune.
-    basis: 'Ostrom, Walker et Gardner (1992, à vérifier)',
+    // Ostrom, Walker et Gardner : la possibilité de sanctionner réduit la surexploitation d'une ressource commune,
+    // mais coûte presque autant qu'elle rapporte. Lu dans la version de conférence de 1991 ; chiffres de 1992 non vérifiés.
+    basis: 'Ostrom, Walker et Gardner (version de 1991, p. 34 ; article de 1992 non vérifié)',
     run: (ctx) => {
       const without = ctx.runs({ size: SIZE, composition: FREE_RIDERS }, 60);
       const withSanctions = ctx.runs({ size: SIZE, composition: FREE_RIDERS, params: { pondSanctionsEnabled: true } }, 60);

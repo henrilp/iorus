@@ -74,6 +74,10 @@ export class Simulation {
         ? this.sanction(adults, (v) => this.restraints.get(v.id) ?? 0, (v) => (v.last.pondSanctionsReceived += 1))
         : 0;
       this.incomes = new Map(adults.map((v) => [v.id, this.seasonIncome(v)]));
+      for (const v of adults) {
+        v.yearIncome += this.incomes.get(v.id) ?? 0;
+        v.yearSeasons += 1;
+      }
       this.eat();
       this.updateBeliefs(adults);
       s.villagers.forEach((v) => {
@@ -291,19 +295,29 @@ export class Simulation {
 
   /**
    * Apprentissage social : on rapproche sa disposition de celle de ceux qui réussissent mieux que soi.
+   * La réussite est le revenu moyen par saison de l'année écoulée, pas la réserve accumulée,
+   * qui reflète surtout l'âge et l'héritage (fiche 0014).
    * L'influençabilité, elle, ne change pas au cours de la vie.
    */
   private imitate(): void {
     const p = this.state.params;
     const adults = this.state.villagers.filter((v) => this.isAdult(v));
-    if (adults.length < 2) return;
-    const before = new Map(adults.map((v) => [v.id, { d: v.disposition, w: v.wealth }]));
-    for (const v of adults) {
-      if (!this.rng.chance(p.imitationProbability)) continue;
-      const model = this.rng.pick(adults);
-      const m = before.get(model.id);
-      if (!m || model.id === v.id || m.w <= v.wealth) continue;
-      v.disposition = clamp01(v.disposition + p.imitationRate * (m.d - v.disposition));
+    if (adults.length >= 2) {
+      const income = (v: Villager) => (v.yearSeasons > 0 ? v.yearIncome / v.yearSeasons : undefined);
+      const before = new Map(adults.map((v) => [v.id, { d: v.disposition, income: income(v) }]));
+      for (const v of adults) {
+        if (!this.rng.chance(p.imitationProbability)) continue;
+        const model = this.rng.pick(adults);
+        const m = before.get(model.id);
+        const own = before.get(v.id)?.income;
+        // Un adulte depuis moins d'une saison n'a pas encore de revenu à comparer.
+        if (!m || model.id === v.id || m.income === undefined || own === undefined || m.income <= own) continue;
+        v.disposition = clamp01(v.disposition + p.imitationRate * (m.d - v.disposition));
+      }
+    }
+    for (const v of this.state.villagers) {
+      v.yearIncome = 0;
+      v.yearSeasons = 0;
     }
   }
 
@@ -330,6 +344,8 @@ export class Simulation {
       // Personne ne meurt de vieillesse avant l'âge adulte.
       lifespanYears: Math.max(p.adultAge, this.rng.normal(p.lifeExpectancy, p.lifeExpectancySd)),
       hungerSeasons: 0,
+      yearIncome: 0,
+      yearSeasons: 0,
       parentId,
       isPlayer: false,
       last: emptyLast(),
