@@ -3,6 +3,7 @@ import { bins10, gini, mean } from './metrics';
 import { DEFAULT_PARAMS, type SimParams } from './params';
 import { Rng } from './rng';
 import type {
+  ChiefPath,
   Composition,
   JournalEntry,
   PlayerAction,
@@ -60,6 +61,8 @@ export class Simulation {
       history: [],
       extinct: false,
       droughtLeft: 0,
+      chief: null,
+      chiefEvent: null,
       controlledId: null,
       conduct: null,
       journal: [],
@@ -117,6 +120,10 @@ export class Simulation {
     if (s.controlledId === null) return false;
     if (action.kind === 'conduct') {
       s.conduct = { ...action.conduct };
+    } else if (action.kind === 'rules') {
+      if (s.chief?.id !== s.controlledId) return false;
+      p.sanctionsEnabled = action.granary;
+      p.pondSanctionsEnabled = action.pond;
     } else {
       const allowed = action.domain === 'granary' ? p.sanctionsEnabled : p.pondSanctionsEnabled;
       const target = s.villagers.find((v) => v.id === action.targetId);
@@ -166,6 +173,7 @@ export class Simulation {
     const adults = s.villagers.filter((v) => this.isAdult(v));
     for (const v of s.villagers) v.last = emptyLast();
     s.playerSanctions = [];
+    s.chiefEvent = null;
     this.startDrought();
     const drought = s.droughtLeft > 0;
 
@@ -182,6 +190,7 @@ export class Simulation {
       for (const v of adults) {
         v.yearIncome += this.incomes.get(v.id) ?? 0;
         v.yearSeasons += 1;
+        v.yearShare += v.last.share;
       }
       this.eat();
       this.updateBeliefs(adults);
@@ -205,6 +214,7 @@ export class Simulation {
 
     if (s.season % p.seasonsPerYear === 0) {
       births += this.reproduce();
+      this.chooseChief();
       this.imitate();
       arrivals += this.arrive();
     }
@@ -452,6 +462,8 @@ export class Simulation {
     const deadIds = new Set(dead.map((v) => v.id));
     s.villagers = s.villagers.filter((v) => !deadIds.has(v.id));
     if (s.controlledId !== null && deadIds.has(s.controlledId)) s.controlledId = null;
+    // Un chef mort laisse la place libre jusqu'à la fin de l'année.
+    if (s.chief && deadIds.has(s.chief.id)) s.chief = null;
     // Héritage : la réserve va aux enfants vivants, sinon elle est perdue.
     for (const d of dead) {
       const heirs = s.villagers.filter((v) => v.parentId === d.id);
@@ -509,7 +521,45 @@ export class Simulation {
     for (const v of this.state.villagers) {
       v.yearIncome = 0;
       v.yearSeasons = 0;
+      v.yearShare = 0;
     }
+  }
+
+  /**
+   * Le chef (fiche 0026). À la fin de l'année, si la place est libre (pas encore de chef, chef mort ou mandat fini),
+   * on tire au hasard l'un des trois chemins, et le chef est l'adulte qui l'occupe : le plus âgé, le plus riche,
+   * ou celui qui a versé en moyenne la plus grande part de sa récolte au grenier dans l'année.
+   * Un chef qui n'est pas le joueur décide aussitôt des règles : il autorise chaque domaine de sanctions avec une
+   * probabilité égale à sa disposition. Le joueur, lui, décide quand il veut pendant son mandat.
+   */
+  private chooseChief(): void {
+    const s = this.state;
+    const p = s.params;
+    if (!p.chiefEnabled) return;
+    if (s.chief && s.chief.until > s.season) return;
+    const adults = s.villagers.filter((v) => this.isAdult(v));
+    if (adults.length === 0) {
+      s.chief = null;
+      return;
+    }
+    const best = (score: (v: Villager) => number, pool: Villager[]) =>
+      pool.reduce((a, v) => (score(v) > score(a) || (score(v) === score(a) && v.id < a.id) ? v : a));
+    const generous = adults.filter((v) => v.yearSeasons > 0);
+    const paths: { path: ChiefPath; pick: () => Villager }[] = [
+      { path: 'eldest', pick: () => best((v) => v.ageSeasons, adults) },
+      { path: 'richest', pick: () => best((v) => v.wealth, adults) },
+      { path: 'mostGenerous', pick: () => best((v) => v.yearShare / v.yearSeasons, generous.length > 0 ? generous : adults) },
+    ];
+    const chosen = this.rng.pick(paths);
+    const chief = chosen.pick();
+    s.chief = { id: chief.id, path: chosen.path, until: s.season + p.chiefTermYears * p.seasonsPerYear };
+    let rules: { granary: boolean; pond: boolean } | null = null;
+    if (chief.id !== s.controlledId) {
+      rules = { granary: this.rng.chance(chief.disposition), pond: this.rng.chance(chief.disposition) };
+      p.sanctionsEnabled = rules.granary;
+      p.pondSanctionsEnabled = rules.pond;
+    }
+    s.chiefEvent = { chiefId: chief.id, path: chosen.path, rules };
   }
 
   /**
@@ -563,6 +613,7 @@ export class Simulation {
       hungerSeasons: 0,
       yearIncome: 0,
       yearSeasons: 0,
+      yearShare: 0,
       parentId,
       home,
       isPlayer: false,

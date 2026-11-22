@@ -69,6 +69,12 @@ describe('une vie en texte', () => {
     expect(session.log.some((e) => e.text.includes('venues d’ailleurs'))).toBe(true);
   });
 
+  test('un chef est choisi et raconté ; si c’est le joueur, il décide des règles', () => {
+    const { session, moments } = playLife({ ...settings, params: { ...settings.params, chiefEnabled: true } }, 3);
+    expect(session.log.some((e) => e.text.includes('devient chef')) || moments.includes('chief-player')).toBe(true);
+    if (moments.includes('chief-player')) expect(session.log.some((e) => e.text.includes('en chef, tu décides'))).toBe(true);
+  });
+
   test('les noms sont stables et distincts', () => {
     const names = new Set(Array.from({ length: 1728 }, (_, i) => villagerName(i)));
     expect(names.size).toBe(1728);

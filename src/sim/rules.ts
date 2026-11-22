@@ -193,6 +193,18 @@ export const RULES: Rule[] = [
     params: ['fertileAgeMin', 'fertileAgeMax', 'birthWealthThreshold', 'birthProbability', 'inheritanceNoise', 'birthEndowment'],
   },
   {
+    id: 'chief',
+    phase: 'year',
+    title: { fr: 'Le chef (si l’option est activée)', en: 'The chief (if enabled)' },
+    text: {
+      fr: 'Si la place de chef est libre (au début, à la mort du chef, ou à la fin de son mandat), on tire au hasard l’un de trois chemins, et le chef est l’adulte qui l’occupe : le plus âgé, le plus riche, ou celui qui a versé en moyenne la plus grande part de sa récolte au grenier dans l’année. Aucun chemin n’est privilégié. Le chef décide quelles sanctions sont autorisées au village : à son arrivée, il autorise chaque domaine (grenier, pêche) avec une probabilité égale à sa disposition, comme la propension à sanctionner grandit avec la disposition. Ses règles restent jusqu’au chef suivant. Si le chef est le joueur, il décide lui-même, quand il veut pendant son mandat. Un chef mort laisse la place libre jusqu’à la fin de l’année.',
+      en: 'If the chief’s place is free (at the start, when the chief dies, or at the end of their term), one of three paths is drawn at random, and the chief is the adult who holds it: the oldest, the richest, or whoever gave on average the largest share of their harvest to the granary during the year. No path is favoured. The chief decides which sanctions are allowed in the village: on arrival, they allow each domain (granary, fishing) with a probability equal to their disposition, just as the propensity to punish grows with disposition. Their rules stay until the next chief. If the chief is the player, they decide themselves, whenever they want during their term. A dead chief leaves the place free until the end of the year.',
+    },
+    formula:
+      'si [chiefEnabled] et place libre : chemin tiré parmi (plus âgé, plus riche, plus grande part moyenne versée dans l’année) ; mandat = [chiefTermYears] ans ; chef non joueur : [sanctionsEnabled] avec probabilité disposition, [pondSanctionsEnabled] avec probabilité disposition',
+    params: ['chiefEnabled', 'chiefTermYears', 'sanctionsEnabled', 'pondSanctionsEnabled'],
+  },
+  {
     id: 'imitation',
     phase: 'year',
     title: { fr: 'L’imitation', en: 'Imitation' },

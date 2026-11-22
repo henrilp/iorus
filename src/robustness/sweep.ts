@@ -23,6 +23,7 @@ export const EXCLUDED: Partial<Record<keyof SimParams, string>> = {
   droughtSeverity: 'sans effet tant que les sécheresses sont désactivées',
   arrivalProbability: 'vaut 0 (jamais) par défaut, et une variation proportionnelle de 0 reste 0 (fiche 0025)',
   arrivalSize: 'sans effet tant que les arrivées sont désactivées',
+  chiefTermYears: 'sans effet tant que le village n’a pas de chef (fiche 0026)',
 };
 
 export interface CheckOutcome {

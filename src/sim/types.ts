@@ -28,6 +28,8 @@ export interface Villager {
   yearIncome: number;
   /** Saisons passées adulte depuis le début de l'année, pour ramener le revenu à une moyenne par saison. */
   yearSeasons: number;
+  /** Parts versées au grenier depuis le début de l'année, additionnées (pour désigner le plus généreux). */
+  yearShare: number;
   parentId: number | null;
   /**
    * Emplacement de sa maison sur l'anneau du village. Les villageois sont rangés par maison, puis par identifiant :
@@ -86,7 +88,28 @@ export type SanctionDomain = 'granary' | 'pond';
 /** Une décision du joueur. Elle s'applique à la saison suivante. */
 export type PlayerAction =
   | { kind: 'conduct'; conduct: PlayerConduct }
-  | { kind: 'sanction'; targetId: number; domain: SanctionDomain };
+  | { kind: 'sanction'; targetId: number; domain: SanctionDomain }
+  /** Seulement s'il est chef : les sanctions autorisées au village. */
+  | { kind: 'rules'; granary: boolean; pond: boolean };
+
+/** Les chemins vers la place de chef (fiche 0026). */
+export type ChiefPath = 'eldest' | 'richest' | 'mostGenerous';
+
+export interface Chief {
+  id: number;
+  /** Le chemin tiré quand il a été choisi. */
+  path: ChiefPath;
+  /** Saison à partir de laquelle son mandat est fini. */
+  until: number;
+}
+
+/** Un changement de chef, ou de règles, survenu pendant la dernière saison. */
+export interface ChiefEvent {
+  chiefId: number;
+  path: ChiefPath;
+  /** Les sanctions autorisées après sa décision ; null si c'est le joueur, qui décide lui-même. */
+  rules: { granary: boolean; pond: boolean } | null;
+}
 
 /** Le journal des choix : avec la graine et les réglages, il suffit à rejouer exactement la même vie. */
 export interface JournalEntry {
@@ -156,6 +179,10 @@ export interface SimState {
   nextId: number;
   history: SeasonMetrics[];
   extinct: boolean;
+  /** Le chef du village, s'il y en a un. */
+  chief: Chief | null;
+  /** Le chef choisi pendant la dernière saison, s'il y en a eu un. */
+  chiefEvent: ChiefEvent | null;
   /** Saisons de sécheresse qui restent, celle en cours comprise ; 0 hors sécheresse. */
   droughtLeft: number;
   /** Le villageois que le joueur conduit, tant qu'il vit ; null sinon. */

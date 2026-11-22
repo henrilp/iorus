@@ -8,7 +8,7 @@
  * Tout ce qui règle le rythme (âges des chapitres, délais entre deux moments) est dans `PACING`, affiché sur la page :
  * ces nombres ne touchent pas le moteur, mais ils décident quand le joueur peut changer d'avis.
  */
-import { Simulation, isAdult, mean, type Composition, type PlayerConduct, type SimParams, type Villager } from '../sim';
+import { Simulation, isAdult, mean, type ChiefPath, type Composition, type PlayerConduct, type SimParams, type Villager } from '../sim';
 import { villagerName } from './names';
 
 export const PACING = {
@@ -22,6 +22,8 @@ export const PACING = {
   droughtProbability: 0.04,
   /** Probabilité annuelle d'arrivée de nouveaux venus proposée par défaut (désactivée hors du prototype). */
   arrivalProbability: 0.03,
+  /** Le village a un chef dans le prototype (désactivé hors du prototype). */
+  chiefEnabled: true,
   /** Saisons de suite sous la moyenne avant qu'un voisin soit signalé. */
   cheaterStreak: 2,
   /** Nombre de voisins dont on parle quand le voisinage du moteur est désactivé. */
@@ -82,6 +84,20 @@ const fmt = (x: number) => num.format(x);
 const sacks = (share: number) => `${Math.round(share * 10)} sac${Math.round(share * 10) > 1 ? 's' : ''} sur 10`;
 const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`;
 
+const CHIEF_PATHS: Record<ChiefPath, string> = {
+  eldest: 'la personne la plus âgée du village',
+  richest: 'la personne la plus riche du village',
+  mostGenerous: 'la personne qui a versé la plus grande part de sa récolte au grenier cette année',
+};
+
+/** Les sanctions autorisées, dites en une phrase. */
+export function rulesText(granary: boolean, pond: boolean): string {
+  if (granary && pond) return 'les sanctions sont autorisées au grenier et à l’étang';
+  if (granary) return 'les sanctions sont autorisées au grenier, pas à l’étang';
+  if (pond) return 'les sanctions sont autorisées à l’étang, pas au grenier';
+  return 'aucune sanction n’est autorisée';
+}
+
 export function stanceLabel(stances: Stance<number | 'neighbors'>[], value: number | 'neighbors'): string {
   return stances.find((s) => s.value === value)?.label ?? (typeof value === 'number' ? sacks(value) : String(value));
 }
@@ -126,6 +142,8 @@ export class LifeSession {
   private starved = false;
   /** Vrai si une sécheresse a commencé à la saison qui vient d'être calculée. */
   private droughtStarted = false;
+  /** Vrai si le village vient de choisir le joueur comme chef. */
+  private chosenChief = false;
 
   constructor(settings: LifeSettings) {
     this.settings = settings;
@@ -295,6 +313,7 @@ export class LifeSession {
     this.droughtStarted = !!history.at(-1)?.drought && !history.at(-2)?.drought;
     if (this.droughtStarted && this.phase !== 'chapter') this.event(`Une sécheresse, quand tu avais ${Math.floor(this.ageYears)} ans.`);
     this.newcomers(before);
+    this.chiefNews();
     if (this.phase === 'chapter') this.note('season', this.seasonText(v));
     this.sanctionOutcomes();
   }
@@ -354,6 +373,38 @@ export class LifeSession {
       ],
       choices: [],
     });
+  }
+
+  /** Un nouveau chef : le joueur décide (moment grave), sinon on raconte qui et quelles règles. */
+  private chiefNews(): void {
+    const e = this.sim.state.chiefEvent;
+    if (!e) return;
+    if (e.chiefId === this.playerId) {
+      this.chosenChief = true;
+      return;
+    }
+    const age = Math.floor(this.ageYears);
+    const who = this.byId(e.chiefId);
+    const name = who ? this.relation(who) : villagerName(e.chiefId);
+    const rules = e.rules ? rulesText(e.rules.granary, e.rules.pond) : '';
+    const text = `${name} devient chef : c’est ${CHIEF_PATHS[e.path]}. Désormais, ${rules}.`;
+    if (this.phase === 'chapter') this.push({ id: 'chief', title: 'Un nouveau chef', lines: [text], choices: [] });
+    else this.event(`Quand tu avais ${age} ans, ${text}`);
+  }
+
+  /** Le chef actuel et la fin de son mandat, pour l'affichage. */
+  get chief(): { name: string; isPlayer: boolean; untilAge: number | null } | null {
+    const c = this.sim.state.chief;
+    if (!c) return null;
+    const v = this.player;
+    const untilAge = v ? Math.floor((v.ageSeasons + (c.until - this.sim.state.season)) / this.p.seasonsPerYear) : null;
+    return { name: villagerName(c.id), isPlayer: c.id === this.playerId, untilAge };
+  }
+
+  /** Le joueur chef change les règles du village. */
+  setRules(granary: boolean, pond: boolean): void {
+    if (!this.sim.act({ kind: 'rules', granary, pond })) return;
+    this.note('choice', `À ${Math.floor(this.ageYears)} ans, en chef, tu décides que ${rulesText(granary, pond)}.`);
   }
 
   private readonly knownChildren = new Set<number>();
@@ -588,6 +639,29 @@ export class LifeSession {
     const p = this.p;
     const c = PACING.cooldown;
     const kids = this.children().filter((k) => !isAdult(k, p)).length;
+
+    if (this.chosenChief) {
+      this.chosenChief = false;
+      const c = this.sim.state.chief!;
+      this.push({
+        id: 'chief-player',
+        title: 'Le village te choisit comme chef',
+        lines: [
+          `Tu es ${CHIEF_PATHS[c.path]}. Le village te confie cette place pour ${p.chiefTermYears} ans.`,
+          `Le chef décide quelles sanctions sont autorisées. Une sanction coûte ${fmt(p.sanctionCost)} à qui la donne et fait perdre ${fmt(p.sanctionFine)} à qui la reçoit ; elle vise qui verse nettement moins que les autres au grenier, ou pêche nettement plus. Aujourd’hui, ${rulesText(p.sanctionsEnabled, p.pondSanctionsEnabled)}.`,
+          'Ce que tu décides restera jusqu’au chef suivant, qui décidera à son tour.',
+        ],
+        choices: (
+          [
+            ['Autoriser les sanctions au grenier et à l’étang', true, true],
+            ['Seulement au grenier', true, false],
+            ['Seulement à l’étang', false, true],
+            ['Aucune sanction', false, false],
+          ] as const
+        ).map(([label, granary, pond]) => ({ label, run: () => this.setRules(granary, pond) })),
+      });
+      return true;
+    }
 
     if (this.droughtStarted) {
       this.droughtStarted = false;

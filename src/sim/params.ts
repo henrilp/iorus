@@ -92,6 +92,10 @@ export interface SimParams {
   arrivalProbability: number;
   /** Nombre de nouveaux venus à chaque arrivée. */
   arrivalSize: number;
+  /** Le village a un chef, qui installe ou retire les sanctions (fiche 0026). */
+  chiefEnabled: boolean;
+  /** Durée du mandat d'un chef, en années. */
+  chiefTermYears: number;
 }
 
 export const DEFAULT_PARAMS: SimParams = {
@@ -143,4 +147,6 @@ export const DEFAULT_PARAMS: SimParams = {
   playerStartAge: 15,
   arrivalProbability: 0,
   arrivalSize: 5,
+  chiefEnabled: false,
+  chiefTermYears: 10,
 };

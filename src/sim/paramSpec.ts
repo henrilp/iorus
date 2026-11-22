@@ -388,6 +388,36 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     },
     status: 'hypothese',
   },
+  chiefEnabled: {
+    group: 'sanctions',
+    label: { fr: 'Un chef pour le village', en: 'A chief for the village' },
+    help: {
+      fr: 'Le village a un chef, qui décide quelles sanctions sont autorisées. Il est choisi par l’un de trois chemins tiré au hasard : le plus âgé, le plus riche ou le plus généreux au grenier. Les deux options de sanctions ne valent alors qu’au départ.',
+      en: 'The village has a chief, who decides which sanctions are allowed. They are chosen through one of three paths drawn at random: the oldest, the richest or the most generous at the granary. The two sanction options then only apply at the start.',
+    },
+    status: 'hypothese',
+    note: {
+      fr: 'Désactivé par défaut : les faits stylisés fixent eux-mêmes les sanctions, qu’un chef changerait. Trois chemins tirés au hasard plutôt qu’un seul, pour qu’aucun (la richesse, la générosité, l’âge) ne soit présenté comme la voie vers le pouvoir (fiche 0026).',
+      en: 'Off by default: the stylised facts set the sanctions themselves, which a chief would change. Three paths drawn at random rather than one, so that none (wealth, generosity, age) is presented as the way to power (decision 0026).',
+    },
+  },
+  chiefTermYears: {
+    group: 'sanctions',
+    label: { fr: 'Mandat du chef', en: 'Chief’s term' },
+    help: {
+      fr: 'Nombre d’années avant qu’un nouveau chef soit choisi, si le chef n’est pas mort avant. Le même peut être choisi à nouveau.',
+      en: 'Number of years before a new chief is chosen, unless the chief dies earlier. The same person can be chosen again.',
+    },
+    unit: YEARS,
+    min: 1,
+    max: 100,
+    step: 1,
+    status: 'hypothese',
+    note: {
+      fr: 'Dix ans : un chapitre de la vie du joueur, assez pour que les règles d’un chef aient le temps d’agir (fiche 0026).',
+      en: 'Ten years: one chapter of the player’s life, long enough for a chief’s rules to have time to act (decision 0026).',
+    },
+  },
   pondSanctionsEnabled: {
     group: 'sanctions',
     label: { fr: 'Sanctions contre la surpêche', en: 'Sanctions against overfishing' },

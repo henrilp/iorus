@@ -249,3 +249,49 @@ describe('nouveaux venus', () => {
     }
   });
 });
+
+describe('chef', () => {
+  const base: SimConfig = { ...config, life: undefined, params: {} };
+
+  test('désactivé par défaut : son mandat ne change rien', () => {
+    const a = new Simulation(base).run(200);
+    const b = new Simulation({ ...base, params: { chiefTermYears: 3 } }).run(200);
+    expect(b).toEqual(a);
+  });
+
+  test('un chef est choisi en fin d’année par l’un des trois chemins, pour la durée de son mandat', () => {
+    const sim = new Simulation({ ...base, params: { chiefEnabled: true, chiefTermYears: 2 } });
+    const paths = new Set<string>();
+    const chiefs: number[] = [];
+    for (let i = 0; i < 80 * spy; i++) {
+      sim.step();
+      const e = sim.state.chiefEvent;
+      if (!e) continue;
+      expect(sim.state.season % spy).toBe(0);
+      const adults = sim.state.villagers.filter((v) => isAdult(v, sim.state.params));
+      const chief = adults.find((v) => v.id === e.chiefId)!;
+      if (e.path === 'eldest') expect(chief.ageSeasons).toBe(Math.max(...adults.map((v) => v.ageSeasons)));
+      if (e.path === 'richest') expect(chief.wealth).toBe(Math.max(...adults.map((v) => v.wealth)));
+      // Un chef non joueur fixe les règles.
+      expect(e.rules).not.toBeNull();
+      expect(sim.state.params.sanctionsEnabled).toBe(e.rules!.granary);
+      expect(sim.state.params.pondSanctionsEnabled).toBe(e.rules!.pond);
+      paths.add(e.path);
+      chiefs.push(sim.state.season);
+    }
+    expect(paths).toEqual(new Set(['eldest', 'richest', 'mostGenerous']));
+    // Pas de nouveau chef avant la fin du mandat (sauf mort du chef).
+    expect(chiefs.length).toBeGreaterThan(20);
+  });
+
+  test('le joueur chef décide des règles, et seulement s’il est chef', () => {
+    const sim = new Simulation({ ...config, params: { chiefEnabled: true } });
+    expect(sim.act({ kind: 'rules', granary: true, pond: true })).toBe(false);
+    // On force le joueur à la place de chef pour vérifier qu'il décide lui-même.
+    untilAdult(sim);
+    sim.state.chief = { id: sim.state.controlledId!, path: 'richest', until: sim.state.season + 40 };
+    expect(sim.act({ kind: 'rules', granary: true, pond: false })).toBe(true);
+    expect(sim.state.params.sanctionsEnabled).toBe(true);
+    expect(sim.state.params.pondSanctionsEnabled).toBe(false);
+  });
+});

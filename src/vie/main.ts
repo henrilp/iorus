@@ -58,6 +58,12 @@ function presetSelect(
   return select;
 }
 
+function chiefBox(): HTMLInputElement {
+  const box = el('input', { type: 'checkbox', name: 'chiefEnabled' });
+  box.checked = PACING.chiefEnabled;
+  return box;
+}
+
 function renderSetup(): void {
   const form = el('form');
   const compo = el('select', { name: 'composition' });
@@ -83,6 +89,8 @@ function renderSetup(): void {
       el('legend', {}, 'Règles du village'),
       el('label', { class: 'check' }, el('input', { type: 'checkbox', name: 'sanctionsEnabled' }), ` ${PARAM_SPECS.sanctionsEnabled.label.fr}`),
       el('label', { class: 'check' }, el('input', { type: 'checkbox', name: 'pondSanctionsEnabled' }), ` ${PARAM_SPECS.pondSanctionsEnabled.label.fr}`),
+      el('label', { class: 'check' }, chiefBox(), ` ${PARAM_SPECS.chiefEnabled.label.fr}`),
+      el('p', { class: 'help' }, `${PARAM_SPECS.chiefEnabled.help.fr} Mandat : ${DEFAULT_PARAMS.chiefTermYears} ans.`),
     ),
     el(
       'fieldset',
@@ -101,6 +109,7 @@ function renderSetup(): void {
       observedNeighbors: Number(f.get('observedNeighbors')),
       droughtProbability: Number(f.get('droughtProbability')),
       arrivalProbability: Number(f.get('arrivalProbability')),
+      chiefEnabled: f.get('chiefEnabled') === 'on',
       sanctionsEnabled: f.get('sanctionsEnabled') === 'on',
       pondSanctionsEnabled: f.get('pondSanctionsEnabled') === 'on',
     };
@@ -198,6 +207,8 @@ function renderSide(s: LifeSession): void {
     );
   }
 
+  sections.push(renderRules(s));
+
   const c = PACING.cooldown;
   sections.push(
     el(
@@ -215,6 +226,36 @@ function renderSide(s: LifeSession): void {
     ),
   );
   sideEl.replaceChildren(...sections);
+}
+
+/** Les règles du village et le chef ; le joueur chef peut les changer ici. */
+function renderRules(s: LifeSession): HTMLElement {
+  const p = s.sim.state.params;
+  const chief = s.chief;
+  const box = el('section', {}, el('h2', {}, 'Les règles du village'));
+  if (p.chiefEnabled) {
+    const who = !chief ? 'pas encore de chef' : chief.isPlayer ? 'toi' : chief.name;
+    const until = chief && chief.untilAge !== null ? ` (mandat jusqu’à tes ${chief.untilAge} ans)` : '';
+    box.append(el('p', { class: 'help' }, `Chef : ${who}${until}.`));
+  }
+  const canChange = !!chief?.isPlayer && !!s.player;
+  for (const [key, label] of [
+    ['sanctionsEnabled', 'Sanctions au grenier'],
+    ['pondSanctionsEnabled', 'Sanctions contre la surpêche'],
+  ] as const) {
+    const input = el('input', { type: 'checkbox' });
+    input.checked = p[key];
+    input.disabled = !canChange;
+    input.addEventListener('change', () => {
+      const granary = key === 'sanctionsEnabled' ? input.checked : p.sanctionsEnabled;
+      const pond = key === 'pondSanctionsEnabled' ? input.checked : p.pondSanctionsEnabled;
+      s.setRules(granary, pond);
+      render();
+    });
+    box.append(el('label', { class: 'check' }, input, ` ${label}`));
+  }
+  if (!canChange) box.append(el('p', { class: 'help' }, 'Seul le chef peut les changer.'));
+  return box;
 }
 
 function renderLog(s: LifeSession): void {
