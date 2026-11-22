@@ -80,14 +80,74 @@ export function renderParamsPanel(container: HTMLElement): void {
   resetAll.addEventListener('click', resetParams);
   counts.append(resetAll);
   intro.append(counts);
+
+  const search = el('input', 'search');
+  search.type = 'search';
+  search.placeholder = 'Rechercher un paramètre (nom, rôle, règle…)';
+  search.setAttribute('aria-label', 'Rechercher un paramètre');
+  const searchStatus = el('p', 'help search-status');
+  intro.append(search, searchStatus);
   container.append(intro);
 
+  const sections: { heading: HTMLElement; cards: { card: HTMLElement; haystack: string }[] }[] = [];
   for (const group of GROUPS) {
     const keys = PARAM_KEYS.filter((k) => PARAM_SPECS[k].group === group.id);
     if (keys.length === 0) continue;
-    container.append(el('h2', 'group', t(group.label)));
-    for (const key of keys) container.append(renderParam(key));
+    const heading = el('h2', 'group', t(group.label));
+    container.append(heading);
+    const cards = keys.map((key) => {
+      const card = renderParam(key);
+      container.append(card);
+      return { card, haystack: searchText(key, t(group.label)) };
+    });
+    sections.push({ heading, cards });
   }
+
+  const empty = el('p', 'help', 'Aucun paramètre ne correspond.');
+  empty.hidden = true;
+  container.append(empty);
+
+  search.addEventListener('input', () => {
+    const words = normalize(search.value).split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const section of sections) {
+      let visibleInSection = 0;
+      for (const { card, haystack } of section.cards) {
+        const match = words.every((w) => haystack.includes(w));
+        card.hidden = !match;
+        if (match) visibleInSection += 1;
+      }
+      section.heading.hidden = visibleInSection === 0;
+      shown += visibleInSection;
+    }
+    empty.hidden = shown > 0;
+    searchStatus.textContent = words.length === 0 ? '' : `${shown} paramètre${shown > 1 ? 's' : ''} sur ${PARAM_KEYS.length}`;
+  });
+}
+
+/** Minuscules, sans accents : « Écart » se trouve en tapant « ecart ». */
+function normalize(text: string): string {
+  return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+}
+
+/** Tout ce qui décrit un paramètre, dans les deux langues : on le retrouve par n'importe quel mot qui en parle. */
+function searchText(key: keyof SimParams, groupLabel: string): string {
+  const spec = PARAM_SPECS[key];
+  const parts = [
+    key,
+    groupLabel,
+    spec.label.fr,
+    spec.label.en,
+    spec.help.fr,
+    spec.help.en,
+    spec.unit?.fr,
+    spec.unit?.en,
+    spec.note?.fr,
+    spec.note?.en,
+    t(STATUS_LABELS[spec.status]),
+    ...RULES.filter((r) => r.params.includes(key)).flatMap((r) => [r.title.fr, r.title.en]),
+  ];
+  return normalize(parts.filter(Boolean).join(' '));
 }
 
 function renderParam(key: keyof SimParams): HTMLElement {

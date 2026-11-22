@@ -319,8 +319,8 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     group: 'sanctions',
     label: { fr: 'Sanctions entre villageois', en: 'Sanctions between villagers' },
     help: {
-      fr: 'Autorise un villageois à payer pour faire perdre de la nourriture à un autre qui contribue nettement moins que la moyenne au grenier.',
-      en: 'Allows a villager to pay to make another one, who contributes clearly less than average to the granary, lose food.',
+      fr: 'Autorise un villageois à payer pour faire perdre de la nourriture à un autre qui contribue nettement moins que la moyenne au grenier. Les sanctions ne portent pas sur la pêche.',
+      en: 'Allows a villager to pay to make another one, who contributes clearly less than average to the granary, lose food. Sanctions do not apply to fishing.',
     },
     status: 'hypothese',
   },
