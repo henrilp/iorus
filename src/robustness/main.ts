@@ -7,13 +7,16 @@
  *   --params a,b      ne balayer que ces paramètres
  *   --factors 0.5,2   facteurs appliqués aux valeurs par défaut (défaut : 0.5,0.75,1.5,2)
  *   --seeds 10        nombre de graines (défaut : 5, comme les tests)
- *   --only sweep|pond ne produire qu'une partie du rapport
+ *   --only sweep|game|pond ne produire qu'une partie du rapport
+ *                    (sweep : valeurs par défaut du moteur ; game : configuration du jeu, fiche 0029)
  */
 import { type Condition, holds, SEEDS } from '../checks/helpers';
+import { GAME_CHECK_PARAMS, GAME_PARAMS } from '../sim/gameConfig';
 import type { SimParams } from '../sim/params';
+import { PARAM_SPECS } from '../sim/paramSpec';
 import { STATUS_LABELS } from '../sim/paramSpec';
 import { pondGrid, POND_GROWTHS, POND_RATIOS, POND_SCENARIOS } from './pond';
-import { ALL_CHECKS, DEFAULT_FACTORS, evaluate, EXCLUDED, sweep, sweepableParams, type Variation } from './sweep';
+import { ALL_CHECKS, DEFAULT_FACTORS, evaluate, exclusions, sweep, sweepableParams, type Variation } from './sweep';
 
 const num = (x: number, digits = 2) => x.toFixed(digits).replace('.', ',').replace('-', '−');
 const factorLabel = (f: number) => `×${num(f, 2).replace(/,?0+$/, '')}`;
@@ -29,7 +32,7 @@ function parseArgs(args: string[]) {
     params: get('params')?.split(',') as (keyof SimParams)[] | undefined,
     factors: get('factors')?.split(',').map(Number) ?? DEFAULT_FACTORS,
     seeds: Array.from({ length: seedCount }, (_, i) => i + 1),
-    only: get('only') as 'sweep' | 'pond' | undefined,
+    only: get('only') as 'sweep' | 'game' | 'pond' | undefined,
   };
 }
 
@@ -37,20 +40,28 @@ function describeCondition(c: Condition): string {
   return `${c.label} = ${num(c.value)} (attendu ${c.op} ${num(c.threshold)})`;
 }
 
-function sweepReport(variations: Variation[], factors: number[], seeds: number[]): string[] {
+function sweepReport(
+  variations: Variation[],
+  factors: number[],
+  seeds: number[],
+  base: Partial<SimParams> = {},
+  heading = 'Balayage un paramètre à la fois',
+  intro: string[] = [],
+): string[] {
   const lines: string[] = [];
   const codes = ALL_CHECKS.map(({ kind }, i) => (kind === 'fait' ? `F${i + 1}` : `H${i + 1 - ALL_CHECKS.filter((c) => c.kind === 'fait').length}`));
-  const baseline = evaluate({}, seeds);
+  const baseline = evaluate(base, seeds);
+  const baseLabel = Object.keys(base).length === 0 ? 'Avec les valeurs par défaut' : 'Avec la configuration';
 
-  lines.push('## Balayage un paramètre à la fois', '');
+  lines.push(`## ${heading}`, '', ...intro);
   lines.push(
-    `Chaque paramètre est multiplié par ${factors.map(factorLabel).join(', ')}, borné par les limites du registre et arrondi s'il est entier ; les autres gardent leur valeur par défaut. Une variation qui retombe sur la valeur par défaut ou sur une valeur déjà testée est sautée.`,
+    `Chaque paramètre est multiplié par ${factors.map(factorLabel).join(', ')}, borné par les limites du registre et arrondi s'il est entier ; les autres gardent leur valeur de base. Une variation qui retombe sur la valeur de base ou sur une valeur déjà testée est sautée.`,
     '',
   );
   lines.push('Paramètres exclus :', '');
-  for (const [k, why] of Object.entries(EXCLUDED)) lines.push(`- \`${k}\` : ${why}.`);
+  for (const [k, why] of exclusions(base)) lines.push(`- \`${k}\` : ${why}.`);
   lines.push('', '### Vérifications', '');
-  lines.push('| Code | Vérification | Avec les valeurs par défaut | Marge | Casse sous |', '|---|---|---|---|---|');
+  lines.push(`| Code | Vérification | ${baseLabel} | Marge | Casse sous |`, '|---|---|---|---|---|');
   ALL_CHECKS.forEach(({ check, kind }, i) => {
     const base = baseline[i]!;
     const broken = variations.filter((v) => !v.outcomes[i]!.ok).length;
@@ -122,14 +133,33 @@ export function main(argv: string[], progress: (message: string) => void = () =>
     '',
   );
 
-  if (opts.only !== 'pond') {
+  if (opts.only === undefined || opts.only === 'sweep') {
     const params = opts.params ?? sweepableParams();
     const variations = sweep(params, opts.factors, opts.seeds, (done, total) => {
       progress(`\rbalayage : ${done}/${total}${done === total ? '\n' : ''}`);
     });
     lines.push(...sweepReport(variations, opts.factors, opts.seeds));
   }
-  if (opts.only !== 'sweep') {
+  if (opts.only === undefined || opts.only === 'game') {
+    const base = GAME_CHECK_PARAMS;
+    const params = opts.params ?? sweepableParams(base);
+    const variations = sweep(
+      params,
+      opts.factors,
+      opts.seeds,
+      (done, total) => progress(`\rconfiguration du jeu : ${done}/${total}${done === total ? '\n' : ''}`),
+      base,
+    );
+    const show = (k: keyof SimParams, v: unknown) => `${PARAM_SPECS[k].label.fr} = ${typeof v === 'boolean' ? (v ? 'oui' : 'non') : num(Number(v), 3).replace(/,?0+$/, '')}`;
+    const intro = [
+      `La configuration du jeu (src/sim/gameConfig.ts, fiche 0029) : ${(Object.entries(GAME_PARAMS) as [keyof SimParams, unknown][]).map(([k, v]) => show(k, v)).join(' ; ')}.`,
+      '',
+      'Les vérifications l’appliquent toutes, sauf le chef : les faits sur les sanctions comparent un village avec et sans sanctions fixées d’avance, qu’un chef changerait en cours de partie. Chaque vérification garde ses propres réglages (composition, sanctions), qui l’emportent.',
+      '',
+    ];
+    lines.push(...sweepReport(variations, opts.factors, opts.seeds, base, 'Avec la configuration du jeu', intro));
+  }
+  if (opts.only === undefined || opts.only === 'pond') {
     progress('grille de l’étang…\n');
     lines.push(...pondReport(opts.seeds));
   }

@@ -1,7 +1,7 @@
 /**
  * Page du prototype « une vie », en texte. Toute la logique est dans life.ts ; ici, seulement l'affichage.
  */
-import { DEFAULT_PARAMS, PARAM_SPECS, type Composition, type SimParams } from '../sim';
+import { DEFAULT_PARAMS, GAME_PARAMS, PARAM_SPECS, type Composition, type SimParams } from '../sim';
 import { LifeSession, PACING, RESTRAINT_STANCES, SHARE_STANCES, type LifeSettings, type Stance } from './life';
 
 const setupEl = document.querySelector<HTMLElement>('#setup')!;
@@ -60,7 +60,7 @@ function presetSelect(
 
 function chiefBox(): HTMLInputElement {
   const box = el('input', { type: 'checkbox', name: 'chiefEnabled' });
-  box.checked = PACING.chiefEnabled;
+  box.checked = GAME_PARAMS.chiefEnabled ?? false;
   return box;
 }
 
@@ -78,9 +78,9 @@ function renderSetup(): void {
       el('label', {}, 'Population ', compo),
       el('label', {}, `${PARAM_SPECS.pondCapacityPerVillager.label.fr} `, presetSelect('pondCapacityPerVillager', DEFAULT_PARAMS.pondCapacityPerVillager)),
       el('p', { class: 'help' }, 'Avec le grand étang, les poissons se renouvellent assez pour que l’étang ne meure jamais ; avec le petit, un village qui pêche sans retenue peut le vider.'),
-      el('label', {}, `${PARAM_SPECS.droughtProbability.label.fr} `, presetSelect('droughtProbability', PACING.droughtProbability)),
+      el('label', {}, `${PARAM_SPECS.droughtProbability.label.fr} `, presetSelect('droughtProbability', GAME_PARAMS.droughtProbability ?? 0)),
       el('p', { class: 'help' }, `Une sécheresse dure ${DEFAULT_PARAMS.droughtSeasons} saisons ; les champs donnent ${Math.round(DEFAULT_PARAMS.droughtSeverity * 100)} % de moins. La fréquence proposée est un choix du prototype, pas une fréquence observée.`),
-      el('label', {}, `${PARAM_SPECS.arrivalProbability.label.fr} `, presetSelect('arrivalProbability', PACING.arrivalProbability)),
+      el('label', {}, `${PARAM_SPECS.arrivalProbability.label.fr} `, presetSelect('arrivalProbability', GAME_PARAMS.arrivalProbability ?? 0)),
       el('p', { class: 'help' }, `À chaque arrivée, ${DEFAULT_PARAMS.arrivalSize} personnes venues d’ailleurs s’installent. Elles sont tirées comme les villageois de départ : le moteur ne leur prête aucun trait particulier.`),
     ),
     el(
@@ -96,7 +96,7 @@ function renderSetup(): void {
       'fieldset',
       {},
       el('legend', {}, 'Ce que chacun voit'),
-      el('label', {}, `${PARAM_SPECS.observedNeighbors.label.fr} `, presetSelect('observedNeighbors', 2)),
+      el('label', {}, `${PARAM_SPECS.observedNeighbors.label.fr} `, presetSelect('observedNeighbors', GAME_PARAMS.observedNeighbors ?? 0)),
       el('p', { class: 'help' }, PARAM_SPECS.observedNeighbors.help.fr),
     ),
     el('button', { type: 'submit', class: 'primary' }, 'Commencer une vie'),

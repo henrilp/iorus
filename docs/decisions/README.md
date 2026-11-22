@@ -69,3 +69,4 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0026](0026-le-chef.md) | Le chef, en option : trois chemins tirés au hasard, et des règles qui lui survivent | Acceptée, en partie remplacée par 0027 |
 | [0027](0027-chemins-du-chef-equilibres.md) | Les chemins du chef rééquilibrés : le revenu plutôt que la réserve, et un tirage parmi les trois premiers | Acceptée |
 | [0028](0028-la-nourriture-se-perd.md) | La nourriture se perd : 2 % de la réserve chaque saison | Acceptée |
+| [0029](0029-configuration-du-jeu.md) | La configuration du jeu en un seul endroit, revérifiée par l'outil de robustesse | Acceptée (valeurs à trancher) |

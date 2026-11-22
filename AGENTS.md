@@ -50,7 +50,7 @@ Une fiche acceptée ne se réécrit pas : seule sa ligne de statut peut changer 
 pnpm install
 pnpm dev        # labo sur http://localhost:5173, prototype d'une vie sur /vie/, jeu sur /jeu/
 pnpm test       # tous les tests du moteur
-pnpm robustness # quels faits tiennent quand on fait varier les paramètres (rapport Markdown)
+pnpm robustness # quels faits tiennent quand on fait varier les paramètres, avec les valeurs par défaut et avec la configuration du jeu (rapport Markdown)
 pnpm typecheck
 pnpm build
 ```

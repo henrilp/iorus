@@ -181,7 +181,7 @@ Le moteur doit reproduire qualitativement ces comportements. Chacun est un test 
 
 ### Robustesse
 
-Un fait reproduit avec les valeurs par défaut ne dit pas grand-chose si ces valeurs sont des hypothèses. `pnpm robustness` produit un rapport qui dit, pour chaque fait stylisé et chaque hypothèse de calibrage, sous quelles variations des paramètres il tient ou casse, et explore à quelles conditions l'étang peut s'éteindre. La méthode et ses limites sont décrites dans la fiche [0013](decisions/0013-outil-de-robustesse.md). Un résultat montré au joueur comme une conséquence du modèle doit tenir sous ces variations, ou être présenté comme dépendant d'une hypothèse.
+Un fait reproduit avec les valeurs par défaut ne dit pas grand-chose si ces valeurs sont des hypothèses. `pnpm robustness` produit un rapport qui dit, pour chaque fait stylisé et chaque hypothèse de calibrage, sous quelles variations des paramètres il tient ou casse, et explore à quelles conditions l'étang peut s'éteindre. La méthode et ses limites sont décrites dans la fiche [0013](decisions/0013-outil-de-robustesse.md). Le rapport refait le même balayage avec la configuration du jeu (`src/sim/gameConfig.ts`), c'est-à-dire avec les options que le jeu active par-dessus les valeurs par défaut du moteur (décision [0029](decisions/0029-configuration-du-jeu.md)). Un résultat montré au joueur comme une conséquence du modèle doit tenir sous ces variations, ou être présenté comme dépendant d'une hypothèse.
 
 ## À vérifier à la main (recette)
 

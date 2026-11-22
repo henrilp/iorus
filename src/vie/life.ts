@@ -18,12 +18,6 @@ export const PACING = {
   chapterYears: 1,
   /** Délai minimal, en saisons, avant qu'un même moment revienne. */
   cooldown: { hunger: 8, sanctioned: 8, childOffer: 8, cheater: 4, hungryNeighbor: 4 },
-  /** Probabilité annuelle de sécheresse proposée par défaut (paramètre du moteur, désactivé hors du prototype). */
-  droughtProbability: 0.04,
-  /** Probabilité annuelle d'arrivée de nouveaux venus proposée par défaut (désactivée hors du prototype). */
-  arrivalProbability: 0.03,
-  /** Le village a un chef dans le prototype (désactivé hors du prototype). */
-  chiefEnabled: true,
   /** Saisons de suite sous la moyenne avant qu'un voisin soit signalé. */
   cheaterStreak: 2,
   /** Nombre de voisins dont on parle quand le voisinage du moteur est désactivé. */
