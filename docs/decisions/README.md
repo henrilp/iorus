@@ -53,3 +53,4 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0010](0010-peche-de-schaefer.md) | La pêche suit le modèle de Schaefer | Acceptée |
 | [0011](0011-sanctions-de-la-surpeche.md) | Sanctions contre la surpêche, sur le modèle de celles du grenier | Acceptée |
 | [0012](0012-mesures-honnetes.md) | Des mesures qui ne trompent pas : revenus et patrimoine, répartition, profils | Acceptée |
+| [0013](0013-outil-de-robustesse.md) | Un outil de robustesse : chaque fait est revérifié quand on fait varier les paramètres | Acceptée |

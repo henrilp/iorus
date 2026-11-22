@@ -16,6 +16,7 @@ On règle le mélange de ces deux élans dans la population d'un village, on lan
 pnpm install
 pnpm dev      # labo du moteur sur http://localhost:5173
 pnpm test     # tests du moteur, dont les faits stylisés
+pnpm robustness > robustesse.md   # quels faits tiennent quand on fait varier les paramètres
 pnpm build
 ```
 

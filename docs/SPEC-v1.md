@@ -165,7 +165,7 @@ En plus des faits stylisés ci-dessous, le moteur a des tests de comportement in
 
 ### Faits stylisés
 
-Le moteur doit reproduire qualitativement ces comportements. Chacun est un test Vitest.
+Le moteur doit reproduire qualitativement ces comportements. Chacun est un test Vitest ; les faits 2 à 8 sont définis une seule fois dans `src/checks/stylizedFacts.ts`, avec leurs seuils, pour que l'outil de robustesse vérifie exactement les mêmes.
 
 1. **Déterminisme** : même graine et mêmes réglages donnent un état identique après 100 saisons.
 2. **Village généreux** : 100 % de dispositions hautes. La contribution reste élevée, l'étang ne s'épuise pas.
@@ -174,6 +174,11 @@ Le moteur doit reproduire qualitativement ces comportements. Chacun est un test 
 5. **Tragédie des communs** : 100 % de dispositions basses. L'étang est surexploité : il tombe sous la moitié de sa capacité et bien plus bas qu'avec des pêcheurs modérés (surexploitation, pas forcément extinction).
 6. **Invasion** : sur plusieurs générations sans sanctions, une petite minorité de profiteurs progresse dans une population de coopérateurs influençables (à confirmer : ce résultat dépend du calibrage, c'est justement ce que le jeu explore).
 7. **Sanctions de la surpêche** : avec une minorité de profiteurs, l'étang est mieux préservé quand la surpêche peut être sanctionnée.
+8. **Invasion contenue** : avec les sanctions du grenier, la disposition moyenne résiste nettement mieux à l'invasion du test 6.
+
+### Robustesse
+
+Un fait reproduit avec les valeurs par défaut ne dit pas grand-chose si ces valeurs sont des hypothèses. `pnpm robustness` produit un rapport qui dit, pour chaque fait stylisé et chaque hypothèse de calibrage, sous quelles variations des paramètres il tient ou casse, et explore à quelles conditions l'étang peut s'éteindre. La méthode et ses limites sont décrites dans la fiche [0013](decisions/0013-outil-de-robustesse.md). Un résultat montré au joueur comme une conséquence du modèle doit tenir sous ces variations, ou être présenté comme dépendant d'une hypothèse.
 
 ## À vérifier à la main (recette)
 
