@@ -18,7 +18,7 @@
     "vitest": "^5.1.1"
   },
   "dependencies": {
-    "phaser": "^3.90.0"
+    "phaser": "^4.2.1"
   },
   "packageManager": "pnpm@10.14.0"
 }

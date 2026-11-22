@@ -6,7 +6,7 @@ Ce fichier est le point d'entrée de toute session d'IA sur ce dépôt. Il dit q
 
 I or Us est une fable philosophique jouable dans le navigateur sur la tension entre se préserver soi (I) et préserver le groupe (Us). On règle une population, on lance le temps, on observe ce qui émerge ; le jeu fait réfléchir sans imposer de conclusion.
 
-Il en existe aujourd'hui le moteur de simulation (`src/sim/`), un outil de robustesse en ligne de commande (`src/robustness/`) et un labo de mise au point sans graphismes (`index.html`, `src/lab/`), publié sur https://henrilp.github.io/iorus/. Le jeu en pixel art (Phaser) n'est pas commencé.
+Il en existe aujourd'hui le moteur de simulation (`src/sim/`), un outil de robustesse en ligne de commande (`src/robustness/`) et un labo de mise au point sans graphismes (`index.html`, `src/lab/`), publié sur https://henrilp.github.io/iorus/. Le jeu (Phaser 4) en est au squelette : réglage, village en formes provisoires et contrôle du temps (`jeu/index.html`, `src/game/`), publié sur https://henrilp.github.io/iorus/jeu/.
 
 ## À lire, dans cet ordre
 
@@ -24,7 +24,7 @@ Il en existe aujourd'hui le moteur de simulation (`src/sim/`), un outil de robus
   - Tout comportement du moteur est décrit dans `src/sim/rules.ts`, dans l'ordre d'exécution, avec sa formule. Modifier `engine.ts` ou `behavior.ts` sans mettre à jour `rules.ts` dans le même commit est une erreur.
   - Les textes du registre sont en français et en anglais.
 - **Faits observés et hypothèses sont séparés.** `src/checks/stylizedFacts.ts` ne contient que des comportements observés dans la recherche ; les choix de conception testés vont dans `src/checks/calibrationHypotheses.ts`. Ces définitions (scénarios et seuils) sont vérifiées par les tests Vitest et par l'outil de robustesse : ne pas les dupliquer ailleurs. Ne jamais assouplir un seuil pour faire passer un changement sans le dire explicitement à Henri.
-- **Moteur pur et déterministe.** `src/sim/` n'importe ni Phaser ni le DOM ; tout l'aléa passe par `Rng` (même graine et mêmes réglages donnent la même partie). Voir [0002](docs/decisions/0002-moteur-pur-deterministe.md).
+- **Moteur pur et déterministe.** `src/sim/` n'importe ni Phaser ni le DOM ; tout l'aléa passe par `Rng` (même graine et mêmes réglages donnent la même partie). Voir [0002](docs/decisions/0002-moteur-pur-deterministe.md). Le jeu ne tire jamais dans ce `Rng` pour l'affichage, et la vitesse ne change que le nombre de saisons calculées ([0019](docs/decisions/0019-squelette-du-jeu.md)).
 
 ## Décisions : quand et comment écrire une fiche
 
@@ -48,7 +48,7 @@ Une fiche acceptée ne se réécrit pas : seule sa ligne de statut peut changer 
 
 ```bash
 pnpm install
-pnpm dev        # labo sur http://localhost:5173
+pnpm dev        # labo sur http://localhost:5173, jeu sur http://localhost:5173/jeu/
 pnpm test       # tous les tests du moteur
 pnpm robustness # quels faits tiennent quand on fait varier les paramètres (rapport Markdown)
 pnpm typecheck

@@ -109,7 +109,7 @@ Population, richesse moyenne, inégalités de revenu et de patrimoine (indice de
 - **L'étang** : grand ou petit. Avec le grand, l'étang ne meurt jamais ; avec le petit, un village qui pêche sans retenue peut le vider, des villageois qui se modèrent le gardent. Voir la décision [0016](decisions/0016-taille-de-l-etang-au-choix.md).
 - **Inclure mon villageois** : oui par défaut si l'intro a été jouée.
 - **Sanctions entre villageois** : pour le grenier et contre la surpêche, chacune autorisée ou non.
-- **Durée** : nombre de générations (10 par défaut) ou « jusqu'à ce que je m'arrête ».
+- **Durée** : en années, 100 ou 300 (par défaut, environ dix générations), ou « jusqu'à ce que je m'arrête ». La génération n'est pas une unité du moteur, d'où les années (décision [0019](decisions/0019-squelette-du-jeu.md)).
 - **Graine** : affichée et modifiable, pour rejouer exactement la même partie.
 
 Le réglage dit « I/Us » côté joueur. Dans le jeu, aucun libellé politique.
@@ -119,7 +119,7 @@ Le réglage dit « I/Us » côté joueur. Dans le jeu, aucun libellé politique.
 - **Carte en pixel art**, vue de dessus : maisons, champs, grenier, étang. Les villageois marchent vers le champ, le grenier et l'étang selon la saison. Les saisons changent l'apparence.
 - **Les traits (disposition, influençabilité) ne sont pas affichés par défaut.** Un clic sur un villageois ouvre sa fiche : nom, âge, réserve, ce qu'il a fait les dernières saisons, son parent.
 - **Signes visuels** : niveau du grenier, poissons visibles dans l'étang, maisons vides quand la population baisse, petite icône lors d'une sanction.
-- **Contrôle du temps** : pause, ×1, ×4, ×32, et « passer 10 ans » (calcul sans animation).
+- **Contrôle du temps** : pause, ×1, ×4, ×32, et « passer 10 ans » (calcul sans animation). Le moteur calcule une saison d'un coup ; l'écran la raconte ensuite (champ, grenier, étang, sanctions, retour). À ×32, les villageois ne marchent plus et seuls les niveaux bougent.
 - **Panneau de courbes**, repliable : population, inégalités de revenu et de patrimoine, stock de l'étang, contribution moyenne, traits moyens et répartition des dispositions.
 - **Lignée du joueur** : un repère discret permet de suivre son villageois puis ses descendants.
 
@@ -147,14 +147,14 @@ Tous les paramètres sont visibles avec leur statut. En revanche, aucun chiffre 
 
 ## Le labo
 
-En attendant le jeu, `index.html` est un labo de mise au point du moteur, sans graphismes, publié sur GitHub Pages. Il a trois onglets : les réglages essentiels ; tous les paramètres, avec recherche, valeur par défaut, statut, justification et règles qui les utilisent ; les règles du moteur, dans l'ordre, avec leurs formules et une figure de la règle de comportement. Un bandeau signale tout paramètre modifié par rapport aux valeurs par défaut. Le futur « Comment ça marche ? » du jeu lira les mêmes registres.
+À côté du jeu (`jeu/`), `index.html` est un labo de mise au point du moteur, sans graphismes, publié sur GitHub Pages. Il a trois onglets : les réglages essentiels ; tous les paramètres, avec recherche, valeur par défaut, statut, justification et règles qui les utilisent ; les règles du moteur, dans l'ordre, avec leurs formules et une figure de la règle de comportement. Un bandeau signale tout paramètre modifié par rapport aux valeurs par défaut. Le futur « Comment ça marche ? » du jeu lira les mêmes registres.
 
 ## Technique
 
-- **Stack** : TypeScript, Vite, Phaser 3, Vitest.
+- **Stack** : TypeScript, Vite, Phaser 4 (décision [0018](decisions/0018-phaser-4.md)), Vitest.
 - **Séparation stricte** :
   - `src/sim/` contient le moteur, en TypeScript pur, sans aucun import de Phaser ni du DOM. Il est déterministe : PRNG à graine, même graine et mêmes réglages donnent exactement le même résultat. Il expose `step()` (une saison) et `run(n)` (sans rendu).
-  - `src/game/` contient les scènes Phaser (titre, intro, réglage, village, fin) ; elles lisent l'état du moteur sans jamais le modifier directement.
+  - `src/game/` contient le jeu, servi par la page `jeu/index.html` (décision [0019](decisions/0019-squelette-du-jeu.md)). Phaser ne dessine que le village (`src/game/scenes/`) ; le réglage, les commandes du temps, la fiche d'un villageois et les autres écrans à base de texte sont en HTML par-dessus le canevas (`src/game/ui/`), plus accessible et plus simple à traduire. La logique qui ne dessine pas (temps, plan du village, chorégraphie d'une saison) vit dans `src/game/core/`, sans Phaser ni DOM, et elle est testée. Le jeu lit l'état du moteur sans jamais le modifier ; la vitesse ne décide que du nombre de saisons calculées, jamais de leur contenu.
   - `src/i18n/` contiendra `fr.json` et `en.json` pour les textes du jeu. Aucun texte en dur dans le code. Les textes qui décrivent le modèle (paramètres, règles) vivent, eux, dans les registres de `src/sim/`, déjà en français et en anglais.
   - `src/lab/` contient le labo.
 - **Graphismes** : packs pixel art libres de droits (licence vérifiée et notée dans `assets/LICENSES.md`) ou sprites originaux. Aucun élément repris d'un jeu existant.

@@ -1,6 +1,6 @@
 # 0002. Un moteur pur, déterministe et séparé du rendu
 
-- Statut : Acceptée
+- Statut : Acceptée ; en partie remplacée par [0018](0018-phaser-4.md) (Phaser 4 au lieu de Phaser 3)
 - Date : 2026-11-22
 
 ## Contexte

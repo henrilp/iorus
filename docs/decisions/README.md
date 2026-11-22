@@ -42,7 +42,7 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | N° | Décision | Statut |
 |---|---|---|
 | [0001](0001-fable-sans-etiquette-politique.md) | Une fable sans étiquette politique ni argument d'autorité | Acceptée |
-| [0002](0002-moteur-pur-deterministe.md) | Un moteur pur, déterministe et séparé du rendu | Acceptée |
+| [0002](0002-moteur-pur-deterministe.md) | Un moteur pur, déterministe et séparé du rendu | Acceptée, en partie remplacée par 0018 |
 | [0003](0003-transparence-totale-du-moteur.md) | Transparence totale du moteur : registres, statuts, aucune constante cachée | Acceptée |
 | [0004](0004-comportement-a-un-seul-trait.md) | Un seul trait I/Us, le suivi des autres dosé par la distance au centre | Remplacée par 0005 |
 | [0005](0005-deux-traits-disposition-influencabilite.md) | Deux traits : disposition et influençabilité | Acceptée |
@@ -58,3 +58,5 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0015](0015-modele-v1-fige.md) | Le modèle de la v1 est figé : ce qui reste, ce qui est reporté | Acceptée |
 | [0016](0016-taille-de-l-etang-au-choix.md) | La taille de l'étang est un réglage du joueur : grand ou petit | Acceptée |
 | [0017](0017-premieres-sources-verifiees.md) | Premières sources vérifiées : les chiffres de l'intro et quatre paramètres | Acceptée |
+| [0018](0018-phaser-4.md) | Phaser 4 plutôt que Phaser 3 | Acceptée |
+| [0019](0019-squelette-du-jeu.md) | Le squelette du jeu : une page à part, l'interface en HTML, le village en Phaser, une saison racontée après coup | Acceptée |

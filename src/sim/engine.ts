@@ -324,8 +324,7 @@ export class Simulation {
   // --- Outils ---
 
   private isAdult(v: Villager): boolean {
-    const p = this.state.params;
-    return v.ageSeasons >= p.adultAge * p.seasonsPerYear;
+    return isAdult(v, this.state.params);
   }
 
   private createVillager({ disposition, influence }: Traits, parentId: number | null): Villager {
@@ -377,6 +376,11 @@ export class Simulation {
       deaths,
     };
   }
+}
+
+/** Un villageois est adulte (il travaille, verse au grenier et pêche) à partir de `adultAge`. */
+export function isAdult(v: Villager, p: SimParams): boolean {
+  return v.ageSeasons >= p.adultAge * p.seasonsPerYear;
 }
 
 const clampTraits = (t: Traits): Traits => ({ disposition: clamp01(t.disposition), influence: clamp01(t.influence) });

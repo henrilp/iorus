@@ -8,18 +8,19 @@ On règle le mélange de ces deux élans dans la population d'un village, on lan
 - [Spec v1](docs/SPEC-v1.md) : la première version jouable, « Le village ».
 - [Décisions](docs/decisions/README.md) : pourquoi le modèle est ainsi et pas autrement.
 - Labo en ligne : https://henrilp.github.io/iorus/
+- Squelette du jeu : https://henrilp.github.io/iorus/jeu/
 - Pour les agents IA : [AGENTS.md](AGENTS.md).
 
 ## Développement
 
 ```bash
 pnpm install
-pnpm dev      # labo du moteur sur http://localhost:5173
+pnpm dev      # labo du moteur sur http://localhost:5173, jeu sur /jeu/
 pnpm test     # tests du moteur, dont les faits stylisés
 pnpm robustness > robustesse.md   # quels faits tiennent quand on fait varier les paramètres
 pnpm build
 ```
 
-Le moteur de simulation vit dans `src/sim/`, sans aucune dépendance au rendu. La page `index.html` est pour l'instant un labo qui trace les indicateurs d'une partie complète.
+Le moteur de simulation vit dans `src/sim/`, sans aucune dépendance au rendu. La page `index.html` est un labo qui trace les indicateurs d'une partie complète ; `jeu/index.html` est le jeu (Phaser 4, code dans `src/game/`), pour l'instant un squelette en formes provisoires.
 
 Le site est déployé sur GitHub Pages à chaque push sur `main` (activer Pages avec la source « GitHub Actions » dans les réglages du dépôt).
