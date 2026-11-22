@@ -62,3 +62,5 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0019](0019-squelette-du-jeu.md) | Le squelette du jeu : une page à part, l'interface en HTML, le village en Phaser, une saison racontée après coup | Acceptée |
 | [0020](0020-une-vie-puis-l-histoire.md) | Une vie, puis l'histoire : le joueur vit une vie au village, puis regarde ce qu'il en reste | Proposée |
 | [0021](0021-sanctions-graduees.md) | Des sanctions graduées : la peine grandit avec la faute, pas avec la taille du village | Acceptée |
+| [0022](0022-le-joueur-conduit-son-villageois.md) | Le joueur conduit son villageois : ses choix remplacent la règle commune, et un journal permet de rejouer sa vie | Acceptée |
+| [0023](0023-voisinage-en-option.md) | Le voisinage, en option : chacun peut n'observer que ses voisins sur l'anneau des maisons | Acceptée |

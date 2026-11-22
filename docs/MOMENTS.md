@@ -2,6 +2,8 @@
 
 Brouillon de travail pour la proposition [0020](decisions/0020-une-vie-puis-l-histoire.md) : la liste des moments où le jeu sollicite le joueur pendant sa vie, et ce que chacun fait dans le moteur. Ce document disparaîtra dans la spec si la proposition est acceptée.
 
+Un prototype en texte les met à l'épreuve : la page `vie/` (code dans `src/vie/`), sans graphismes ni déplacement. Tous les moments ci-dessous y sont, sauf la sécheresse (15), qui demande une règle nouvelle.
+
 ## Règles d'écriture
 
 - **Un moment ne fait que présenter une décision que le moteur sait exécuter.** Ses effets sont ceux du moteur, rien d'autre : aucune conséquence écrite à la main (« elle s'en souviendra »). Une scène sans décision possible dans le modèle est un récit avec un seul bouton « Continuer », jamais un faux choix.
@@ -23,7 +25,7 @@ La mort peut venir entre deux chapitres : la vie s'arrête là, sans chapitre de
 
 ## La ligne de conduite
 
-Le villageois du joueur suit sa ligne de conduite, formulée en mots ; chaque mot correspond à une valeur, paramètre du registre au statut `hypothese`.
+Le villageois du joueur suit sa ligne de conduite, formulée en mots ; chaque mot correspond à une valeur que reçoit le moteur, affichée à côté du mot. Ces valeurs sont un choix du prototype, comme la position d'un curseur, pas une règle du moteur ([0022](decisions/0022-le-joueur-conduit-son-villageois.md)).
 
 - **Au grenier** : verser presque rien, un peu, comme mes voisins, beaucoup.
 - **À l'étang** : pêcher tout ce que je peux, avec un peu de retenue, comme mes voisins, très peu.
@@ -90,6 +92,8 @@ Ils peuvent aussi arriver pendant un chapitre ; entre deux chapitres, ils arrêt
 - **Léguer au grenier avant de mourir.** Ce serait une manière simple de « laisser des ressources », mais la règle n'existe pas (la réserve va aux enfants ou se perd).
 
 ## Ce que le moteur doit gagner
+
+A à D sont faits ([0022](decisions/0022-le-joueur-conduit-son-villageois.md)), E l'est en option, désactivé par défaut ([0023](decisions/0023-voisinage-en-option.md)) ; F reste à faire.
 
 - **A. Le joueur décide de sa conduite.** Sa part versée et sa modération viennent de sa ligne de conduite ou de ses gestes, pas de la règle de comportement, sans bruit et sans peur. La partie devient : graine, réglages et journal des choix ; rejouer le journal redonne la même partie. Déjà prévu par 0020, avec une fiche à part.
 - **B. Le joueur sanctionne une cible précise**, une fois, aux conditions des autres villageois.

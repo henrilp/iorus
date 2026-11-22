@@ -16,6 +16,8 @@ export const DEFAULT_FACTORS = [0.5, 0.75, 1.5, 2];
 export const EXCLUDED: Partial<Record<keyof SimParams, string>> = {
   seasonsPerYear: 'change le sens de tous les paramètres « par saison » ; le faire varier seul ne teste rien de cohérent',
   pondDepletedThreshold: 'sert seulement à l’indicateur « étang épuisé », sans effet sur la simulation',
+  observedNeighbors: 'vaut 0 (tout le village) par défaut, et une variation proportionnelle de 0 reste 0 ; à balayer à part si le voisinage devient la règle (fiche 0023)',
+  playerStartAge: 'sans effet sur les vérifications, qui se jouent sans joueur',
 };
 
 export interface CheckOutcome {

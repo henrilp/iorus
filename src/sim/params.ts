@@ -42,6 +42,8 @@ export interface SimParams {
   beliefLearningRate: number;
   /** Petite variation aléatoire des choix (personne n'est une machine). */
   behaviorNoise: number;
+  /** Nombre de voisins que chacun observe pour se faire une idée des autres ; 0 = tout le village (fiche 0023). */
+  observedNeighbors: number;
 
   // Sanctions
   sanctionsEnabled: boolean;
@@ -78,6 +80,8 @@ export interface SimParams {
   imitationProbability: number;
   /** Fraction de l'écart de disposition comblée en imitant. */
   imitationRate: number;
+  /** Âge du villageois du joueur quand il commence sa vie (fiche 0022). */
+  playerStartAge: number;
 }
 
 export const DEFAULT_PARAMS: SimParams = {
@@ -100,6 +104,7 @@ export const DEFAULT_PARAMS: SimParams = {
   conditionalSlope: 0.9,
   beliefLearningRate: 0.4,
   behaviorNoise: 0.04,
+  observedNeighbors: 0,
 
   sanctionsEnabled: false,
   pondSanctionsEnabled: false,
@@ -122,4 +127,5 @@ export const DEFAULT_PARAMS: SimParams = {
   inheritanceNoise: 0.05,
   imitationProbability: 0.1,
   imitationRate: 0.3,
+  playerStartAge: 15,
 };

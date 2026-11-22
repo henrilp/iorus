@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>I or Us — une vie</title>
+    <link rel="stylesheet" href="/src/vie/vie.css" />
+  </head>
+  <body>
+    <header id="top">
+      <h1>I or Us — une vie <span class="tag">prototype en texte</span></h1>
+      <p class="note">
+        Une vie au village en cinq chapitres, à 15, 25, 35, 45 et 55 ans, sans graphismes, pour éprouver les moments et
+        les arbitrages avant de dessiner quoi que ce soit (fiche 0020, brouillon docs/MOMENTS.md). Seul le français est
+        disponible. <a href="../">Retour au labo</a>.
+      </p>
+    </header>
+    <main>
+      <section id="setup"></section>
+      <section id="life" hidden>
+        <aside id="side"></aside>
+        <div id="story">
+          <div id="log" aria-live="polite"></div>
+          <div id="moment" hidden></div>
+          <div id="controls"></div>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/vie/main.ts"></script>
+  </body>
+</html>

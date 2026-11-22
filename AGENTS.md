@@ -6,7 +6,7 @@ Ce fichier est le point d'entrée de toute session d'IA sur ce dépôt. Il dit q
 
 I or Us est une fable philosophique jouable dans le navigateur sur la tension entre se préserver soi (I) et préserver le groupe (Us). On règle une population, on lance le temps, on observe ce qui émerge ; le jeu fait réfléchir sans imposer de conclusion.
 
-Il en existe aujourd'hui le moteur de simulation (`src/sim/`), un outil de robustesse en ligne de commande (`src/robustness/`) et un labo de mise au point sans graphismes (`index.html`, `src/lab/`), publié sur https://henrilp.github.io/iorus/. Le jeu (Phaser 4) en est au squelette : réglage, village en formes provisoires et contrôle du temps (`jeu/index.html`, `src/game/`), publié sur https://henrilp.github.io/iorus/jeu/.
+Il en existe aujourd'hui le moteur de simulation (`src/sim/`), un outil de robustesse en ligne de commande (`src/robustness/`), un labo de mise au point sans graphismes (`index.html`, `src/lab/`), publié sur https://henrilp.github.io/iorus/, et un prototype en texte d'une vie au village (`vie/index.html`, `src/vie/`), publié sur https://henrilp.github.io/iorus/vie/. Le jeu (Phaser 4) en est au squelette : réglage, village en formes provisoires et contrôle du temps (`jeu/index.html`, `src/game/`), publié sur https://henrilp.github.io/iorus/jeu/.
 
 ## À lire, dans cet ordre
 
@@ -48,7 +48,7 @@ Une fiche acceptée ne se réécrit pas : seule sa ligne de statut peut changer 
 
 ```bash
 pnpm install
-pnpm dev        # labo sur http://localhost:5173, jeu sur http://localhost:5173/jeu/
+pnpm dev        # labo sur http://localhost:5173, prototype d'une vie sur /vie/, jeu sur /jeu/
 pnpm test       # tous les tests du moteur
 pnpm robustness # quels faits tiennent quand on fait varier les paramètres (rapport Markdown)
 pnpm typecheck

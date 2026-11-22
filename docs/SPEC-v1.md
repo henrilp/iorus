@@ -149,6 +149,8 @@ Tous les paramètres sont visibles avec leur statut. En revanche, aucun chiffre 
 
 À côté du jeu (`jeu/`), `index.html` est un labo de mise au point du moteur, sans graphismes, publié sur GitHub Pages. Il a trois onglets : les réglages essentiels ; tous les paramètres, avec recherche, valeur par défaut, statut, justification et règles qui les utilisent ; les règles du moteur, dans l'ordre, avec leurs formules et une figure de la règle de comportement. Un bandeau signale tout paramètre modifié par rapport aux valeurs par défaut. Le futur « Comment ça marche ? » du jeu lira les mêmes registres.
 
+À côté, `vie/index.html` est un prototype en texte de la proposition [0020](decisions/0020-une-vie-puis-l-histoire.md) : on y vit une vie au village en cinq chapitres, en choisissant sa ligne de conduite et en répondant aux moments décrits dans [MOMENTS.md](MOMENTS.md). Le moteur accepte pour cela les choix du joueur ([0022](decisions/0022-le-joueur-conduit-son-villageois.md)) et, en option, un voisinage ([0023](decisions/0023-voisinage-en-option.md)).
+
 ## Technique
 
 - **Stack** : TypeScript, Vite, Phaser 4 (décision [0018](decisions/0018-phaser-4.md)), Vitest.

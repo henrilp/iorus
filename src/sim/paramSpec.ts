@@ -288,6 +288,27 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     step: 0.05,
     status: 'hypothese',
   },
+  observedNeighbors: {
+    group: 'behavior',
+    label: { fr: 'Voisins observés', en: 'Observed neighbours' },
+    help: {
+      fr: 'Nombre de voisins sur lesquels chacun se fait une idée de ce que font les autres, au grenier comme à l’étang. Les plus proches sur l’anneau des maisons, alternativement d’un côté et de l’autre. 0 : chacun voit tout le village.',
+      en: 'Number of neighbours from whom each villager forms an idea of what others do, at the granary and the pond. The closest on the ring of houses, alternately on either side. 0: everyone sees the whole village.',
+    },
+    min: 0,
+    max: 20,
+    step: 1,
+    status: 'hypothese',
+    note: {
+      fr: 'Désactivé par défaut (0) : le modèle validé par les faits stylisés est celui où chacun voit tout le village. Le prototype d’une vie l’active pour que l’influence du joueur se voie là où elle agit. Sa valeur décide de la force de l’influence locale : elle devra être choisie pour ce que la recherche dit de la taille des réseaux qu’on observe, pas pour rendre le joueur plus puissant (fiche 0023).',
+      en: 'Off by default (0): the model validated by the stylised facts is the one where everyone sees the whole village. The life prototype turns it on so that the player’s influence shows where it acts. Its value sets the strength of local influence: it must be chosen for what research says about the size of observed networks, not to make the player more powerful (decision 0023).',
+    },
+    presets: [
+      { label: { fr: 'Tout le village', en: 'The whole village' }, value: 0 },
+      { label: { fr: '2 voisins', en: '2 neighbours' }, value: 2 },
+      { label: { fr: '6 voisins', en: '6 neighbours' }, value: 6 },
+    ],
+  },
   behaviorNoise: {
     group: 'behavior',
     label: { fr: 'Part d’imprévisibilité', en: 'Unpredictability' },
@@ -570,5 +591,22 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     max: 1,
     step: 0.05,
     status: 'hypothese',
+  },
+  playerStartAge: {
+    group: 'generations',
+    label: { fr: 'Âge du joueur au début de sa vie', en: 'Player’s age at the start of their life' },
+    help: {
+      fr: 'Quand le joueur vit une vie, son villageois commence à cet âge, enfant d’un villageois de départ. Sans effet en mode observateur.',
+      en: 'When the player lives a life, their villager starts at this age, as the child of a starting villager. No effect in observer mode.',
+    },
+    unit: YEARS,
+    min: 0,
+    max: 60,
+    step: 1,
+    status: 'hypothese',
+    note: {
+      fr: 'Un an avant l’âge adulte : le temps de découvrir le village chez son parent avant la première récolte (fiche 0020).',
+      en: 'One year before adulthood: time to discover the village at one’s parent’s home before the first harvest (decision 0020).',
+    },
   },
 };

@@ -2,7 +2,8 @@ import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 // base relatif : le site est servi sous /iorus/ sur GitHub Pages.
-// Deux pages : le labo du moteur (racine) et le jeu (jeu/), pour que le labo ne charge pas Phaser.
+// Trois pages : le labo du moteur (racine), le prototype en texte d'une vie (vie/) et le jeu (jeu/),
+// pour que le labo et le prototype ne chargent pas Phaser.
 export default defineConfig({
   base: './',
   build: {
@@ -11,6 +12,7 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         lab: resolve(import.meta.dirname, 'index.html'),
+        vie: resolve(import.meta.dirname, 'vie/index.html'),
         jeu: resolve(import.meta.dirname, 'jeu/index.html'),
       },
     },

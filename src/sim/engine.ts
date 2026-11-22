@@ -2,7 +2,18 @@ import { clamp01, granaryShare, pondRestraint, sanctionProbability } from './beh
 import { bins10, gini, mean } from './metrics';
 import { DEFAULT_PARAMS, type SimParams } from './params';
 import { Rng } from './rng';
-import type { Composition, SeasonMetrics, SimConfig, SimState, Traits, Villager } from './types';
+import type {
+  Composition,
+  JournalEntry,
+  PlayerAction,
+  PlayerConduct,
+  SanctionDomain,
+  SeasonMetrics,
+  SimConfig,
+  SimState,
+  Traits,
+  Villager,
+} from './types';
 
 const emptyLast = () => ({
   harvest: 0,
@@ -14,6 +25,7 @@ const emptyLast = () => ({
   sanctionsGiven: 0,
   sanctionsReceived: 0,
   pondSanctionsReceived: 0,
+  punishedBy: [] as number[],
 });
 
 export class Simulation {
@@ -23,6 +35,10 @@ export class Simulation {
   private pondSanctionsThisSeason = 0;
   /** Intentions de modération de la saison, gardées pour la mise à jour des croyances. */
   private readonly restraints = new Map<number, number>();
+  /** Sanction voulue par le joueur pour la saison suivante, au plus une par domaine. */
+  private readonly pendingSanctions = new Map<SanctionDomain, number>();
+  /** Ce que le joueur a réellement fait, pour estimer les traits qu'il transmet (fiche 0022). */
+  private readonly record = { seasons: 0, share: 0, restraint: 0, neighbors: 0 };
 
   constructor(config: SimConfig) {
     const params: SimParams = { ...DEFAULT_PARAMS, ...config.params };
@@ -37,20 +53,98 @@ export class Simulation {
       nextId: 0,
       history: [],
       extinct: false,
+      controlledId: null,
+      conduct: null,
+      journal: [],
+      playerSanctions: [],
     };
 
+    // En mode observateur, le villageois du joueur remplace le premier villageois ; quand il vit sa vie, il naît à part.
+    const observer = config.player !== undefined && config.life === undefined;
     const traits = initialTraits(config.composition, config.size, this.rng);
-    if (config.player && traits.length > 0) traits[0] = { ...config.player };
+    if (observer && config.player && traits.length > 0) traits[0] = { ...config.player };
     traits.forEach((tr, i) => {
-      const isPlayer = i === 0 && config.player !== undefined;
+      const isPlayer = observer && i === 0;
       // Le villageois du joueur est un nouvel arrivant, jeune adulte.
       const ageYears = isPlayer ? params.fertileAgeMin : this.rng.range(params.adultAge, params.initialMaxAge);
-      const v = this.createVillager(tr, null);
+      const v = this.createVillager(tr, null, i);
       v.ageSeasons = Math.floor(ageYears * params.seasonsPerYear);
       v.wealth = params.startingWealth;
       v.isPlayer = isPlayer;
       this.state.villagers.push(v);
     });
+    if (config.life) this.startLife(config.life.conduct);
+  }
+
+  /**
+   * Le joueur commence sa vie enfant d'un villageois de départ assez âgé pour l'avoir eu en âge fertile.
+   * Il hérite de ses traits comme tout enfant ; ils seront remplacés par ce qu'il fera réellement.
+   */
+  private startLife(conduct: PlayerConduct): void {
+    const s = this.state;
+    const p = s.params;
+    const age = (v: Villager) => v.ageSeasons / p.seasonsPerYear;
+    const candidates = s.villagers.filter(
+      (v) => age(v) >= p.fertileAgeMin + p.playerStartAge && age(v) <= p.fertileAgeMax + p.playerStartAge,
+    );
+    const oldest = s.villagers.reduce<Villager | undefined>((a, v) => (!a || v.ageSeasons > a.ageSeasons ? v : a), undefined);
+    const parent = candidates.length > 0 ? this.rng.pick(candidates) : oldest;
+    if (!parent) return;
+    const child = this.createVillager(this.inherit(parent), parent.id, parent.home);
+    child.ageSeasons = Math.floor(p.playerStartAge * p.seasonsPerYear);
+    child.wealth = p.birthEndowment;
+    child.isPlayer = true;
+    s.villagers.push(child);
+    s.controlledId = child.id;
+    s.conduct = { ...conduct };
+  }
+
+  /**
+   * Une décision du joueur, valable à partir de la saison suivante. Elle est inscrite au journal :
+   * graine, réglages et journal suffisent à rejouer la même vie (fiche 0022).
+   * Renvoie faux si la décision n'est pas possible (pas de joueur, cible absente, sanctions non autorisées).
+   */
+  act(action: PlayerAction): boolean {
+    const s = this.state;
+    const p = s.params;
+    if (s.controlledId === null) return false;
+    if (action.kind === 'conduct') {
+      s.conduct = { ...action.conduct };
+    } else {
+      const allowed = action.domain === 'granary' ? p.sanctionsEnabled : p.pondSanctionsEnabled;
+      const target = s.villagers.find((v) => v.id === action.targetId);
+      if (!allowed || !target || target.id === s.controlledId || !this.isAdult(target)) return false;
+      this.pendingSanctions.set(action.domain, target.id);
+    }
+    s.journal.push({ season: s.season, action: structuredClone(action) });
+    return true;
+  }
+
+  /** Le villageois conduit par le joueur, s'il vit encore. */
+  get controlled(): Villager | undefined {
+    const id = this.state.controlledId;
+    return id === null ? undefined : this.state.villagers.find((v) => v.id === id);
+  }
+
+  /**
+   * Les k villageois adultes les plus proches de `id` sur l'anneau des maisons, alternativement après et avant lui.
+   * Sert à la mise à jour des croyances quand `observedNeighbors` > 0, et à l'affichage.
+   */
+  neighbors(id: number, k: number): Villager[] {
+    const adults = this.state.villagers.filter((v) => this.isAdult(v) || v.id === id);
+    const ring = [...adults].sort((a, b) => a.home - b.home || a.id - b.id);
+    const j = ring.findIndex((v) => v.id === id);
+    if (j < 0) return [];
+    const out: Villager[] = [];
+    const n = ring.length;
+    for (let d = 1; out.length < Math.min(k, n - 1); d++) {
+      const after = ring[(j + d) % n];
+      if (after && after.id !== id && !out.includes(after)) out.push(after);
+      if (out.length >= Math.min(k, n - 1)) break;
+      const before = ring[(((j - d) % n) + n) % n];
+      if (before && before.id !== id && !out.includes(before)) out.push(before);
+    }
+    return out;
   }
 
   /** Simule une saison. */
@@ -63,15 +157,16 @@ export class Simulation {
 
     const adults = s.villagers.filter((v) => this.isAdult(v));
     for (const v of s.villagers) v.last = emptyLast();
+    s.playerSanctions = [];
 
     if (adults.length > 0) {
       this.produceAndShare(adults);
       this.fish(adults);
       this.sanctionsThisSeason = p.sanctionsEnabled
-        ? this.sanction(adults, (v) => v.last.share, (v) => (v.last.sanctionsReceived += 1))
+        ? this.sanction(adults, 'granary', (v) => v.last.share, (v) => (v.last.sanctionsReceived += 1))
         : 0;
       this.pondSanctionsThisSeason = p.pondSanctionsEnabled
-        ? this.sanction(adults, (v) => this.restraints.get(v.id) ?? 0, (v) => (v.last.pondSanctionsReceived += 1))
+        ? this.sanction(adults, 'pond', (v) => this.restraints.get(v.id) ?? 0, (v) => (v.last.pondSanctionsReceived += 1))
         : 0;
       this.incomes = new Map(adults.map((v) => [v.id, this.seasonIncome(v)]));
       for (const v of adults) {
@@ -80,6 +175,7 @@ export class Simulation {
       }
       this.eat();
       this.updateBeliefs(adults);
+      this.recordPlayer();
       s.villagers.forEach((v) => {
         v.fearGranary = v.fearGranary * p.fearDecay + v.last.sanctionsReceived * p.sanctionFine;
         v.fearPond = v.fearPond * p.fearDecay + v.last.pondSanctionsReceived * p.sanctionFine;
@@ -89,6 +185,7 @@ export class Simulation {
       this.pondSanctionsThisSeason = 0;
       this.incomes = new Map();
     }
+    this.pendingSanctions.clear();
 
     this.regrowPond();
 
@@ -125,7 +222,8 @@ export class Simulation {
     let pot = 0;
     for (const v of adults) {
       const harvest = Math.max(0, p.baseHarvest * landFactor * (1 + this.rng.normal(0, p.harvestNoise)));
-      const share = granaryShare(v, p, this.rng);
+      const conduct = this.conductOf(v);
+      const share = conduct ? chosen(conduct.share, v.beliefShare) : granaryShare(v, p, this.rng);
       v.last.harvest = harvest;
       v.last.share = share;
       v.last.contributed = share * harvest;
@@ -148,7 +246,8 @@ export class Simulation {
     this.restraints.clear();
     const density = s.pondCapacity > 0 ? s.pondStock / s.pondCapacity : 0;
     const catches = adults.map((v) => {
-      const restraint = pondRestraint(v, p, this.rng);
+      const conduct = this.conductOf(v);
+      const restraint = conduct ? chosen(conduct.restraint, v.beliefRestraint) : pondRestraint(v, p, this.rng);
       this.restraints.set(v.id, restraint);
       v.last.effort = 1 - restraint;
       return p.maxCatch * v.last.effort * density;
@@ -185,20 +284,46 @@ export class Simulation {
    * sous la moyenne. Sinon tous ceux qui veulent sanctionner tombent sur le même, et l'amende grossit
    * avec la taille du village au lieu de grandir avec la faute (fiche 0021).
    */
-  private sanction(adults: Villager[], cooperation: (v: Villager) => number, mark: (target: Villager) => void): number {
+  private sanction(
+    adults: Villager[],
+    domain: SanctionDomain,
+    cooperation: (v: Villager) => number,
+    mark: (target: Villager) => void,
+  ): number {
     const p = this.state.params;
     const avg = mean(adults.map(cooperation));
     const targets = adults.filter((v) => cooperation(v) < avg - p.sanctionGap);
-    if (targets.length === 0) return 0;
-    // Ceux qui sont prêts à sanctionner cette saison (au plus une sanction chacun).
+    const remaining = new Map(targets.map((t) => [t.id, Math.floor((avg - cooperation(t)) / p.sanctionGap)]));
+    let count = 0;
+    const punish = (punisher: Villager, target: Villager) => {
+      remaining.set(target.id, (remaining.get(target.id) ?? 0) - 1);
+      punisher.wealth -= p.sanctionCost;
+      target.wealth -= p.sanctionFine;
+      punisher.last.sanctionsGiven += 1;
+      target.last.punishedBy.push(punisher.id);
+      mark(target);
+      count += 1;
+    };
+
+    // La sanction voulue par le joueur passe en premier, aux mêmes conditions que celles des villageois.
+    const wanted = this.pendingSanctions.get(domain);
+    const player = this.controlled;
+    if (wanted !== undefined && player && this.isAdult(player)) {
+      const target = targets.find((t) => t.id === wanted);
+      const applied = !!target && (remaining.get(target.id) ?? 0) > 0 && player.wealth >= p.sanctionCost;
+      if (target && applied) punish(player, target);
+      this.state.playerSanctions.push({ targetId: wanted, domain, applied });
+    }
+
+    if (targets.length === 0) return count;
+    // Ceux qui sont prêts à sanctionner cette saison (au plus une sanction chacun). Le joueur ne sanctionne jamais de lui-même.
     const willing = adults.filter(
       (punisher) =>
+        punisher.id !== this.state.controlledId &&
         punisher.wealth >= p.sanctionCost &&
         targets.some((t) => t.id !== punisher.id) &&
         this.rng.chance(sanctionProbability(punisher, p)),
     );
-    const remaining = new Map(targets.map((t) => [t.id, Math.floor((avg - cooperation(t)) / p.sanctionGap)]));
-    let count = 0;
     // Tour par tour, pour que les fautifs se partagent les sanctionneurs quand ils sont peu nombreux.
     let progress = true;
     while (progress && willing.length > 0) {
@@ -209,12 +334,7 @@ export class Simulation {
         if (candidates.length === 0) continue;
         const punisher = this.rng.pick(candidates);
         willing.splice(willing.indexOf(punisher), 1);
-        remaining.set(target.id, (remaining.get(target.id) ?? 0) - 1);
-        punisher.wealth -= p.sanctionCost;
-        target.wealth -= p.sanctionFine;
-        punisher.last.sanctionsGiven += 1;
-        mark(target);
-        count += 1;
+        punish(punisher, target);
         progress = true;
       }
     }
@@ -249,15 +369,43 @@ export class Simulation {
     const p = this.state.params;
     const n = adults.length;
     if (n < 2) return;
-    const totalShare = adults.reduce((a, v) => a + v.last.share, 0);
-    const totalRestraint = adults.reduce((a, v) => a + (this.restraints.get(v.id) ?? 0), 0);
+    const restraint = (v: Villager) => this.restraints.get(v.id) ?? 0;
     const lr = p.beliefLearningRate;
+    // Chacun observe ses voisins, ou tout le village si le voisinage est désactivé ou plus grand que le village (fiche 0023).
+    const local = p.observedNeighbors > 0 && p.observedNeighbors < n - 1;
+    const totalShare = adults.reduce((a, v) => a + v.last.share, 0);
+    const totalRestraint = adults.reduce((a, v) => a + restraint(v), 0);
+    const observed = local ? new Map(adults.map((v) => [v.id, this.neighbors(v.id, p.observedNeighbors)])) : undefined;
     for (const v of adults) {
-      const othersShare = (totalShare - v.last.share) / (n - 1);
-      const othersRestraint = (totalRestraint - (this.restraints.get(v.id) ?? 0)) / (n - 1);
+      const seen = observed?.get(v.id);
+      const othersShare = seen ? mean(seen.map((o) => o.last.share)) : (totalShare - v.last.share) / (n - 1);
+      const othersRestraint = seen ? mean(seen.map(restraint)) : (totalRestraint - restraint(v)) / (n - 1);
       v.beliefShare = (1 - lr) * v.beliefShare + lr * othersShare;
       v.beliefRestraint = (1 - lr) * v.beliefRestraint + lr * othersRestraint;
     }
+  }
+
+  /**
+   * Les traits du villageois du joueur ne décident de rien pour lui : ils sont tenus à jour à partir de ce qu'il fait.
+   * Disposition : moyenne de sa part versée et de sa modération sur toutes ses saisons adultes.
+   * Influençabilité : part de ses choix « comme mes voisins ». Ce sont eux que ses enfants héritent et que les autres imitent.
+   */
+  private recordPlayer(): void {
+    const v = this.controlled;
+    const conduct = this.state.conduct;
+    if (!v || !conduct || !this.isAdult(v)) return;
+    const r = this.record;
+    r.seasons += 1;
+    r.share += v.last.share;
+    r.restraint += this.restraints.get(v.id) ?? 0;
+    r.neighbors += (conduct.share === 'neighbors' ? 1 : 0) + (conduct.restraint === 'neighbors' ? 1 : 0);
+    v.disposition = clamp01((r.share + r.restraint) / (2 * r.seasons));
+    v.influence = clamp01(r.neighbors / (2 * r.seasons));
+  }
+
+  /** La ligne de conduite du joueur, si ce villageois est le sien. */
+  private conductOf(v: Villager): PlayerConduct | null {
+    return v.id === this.state.controlledId ? this.state.conduct : null;
   }
 
   private regrowPond(): void {
@@ -277,6 +425,7 @@ export class Simulation {
     if (dead.length === 0) return 0;
     const deadIds = new Set(dead.map((v) => v.id));
     s.villagers = s.villagers.filter((v) => !deadIds.has(v.id));
+    if (s.controlledId !== null && deadIds.has(s.controlledId)) s.controlledId = null;
     // Héritage : la réserve va aux enfants vivants, sinon elle est perdue.
     for (const d of dead) {
       const heirs = s.villagers.filter((v) => v.parentId === d.id);
@@ -290,18 +439,14 @@ export class Simulation {
     const p = s.params;
     const parents = s.villagers.filter((v) => {
       const age = v.ageSeasons / p.seasonsPerYear;
+      // Le joueur peut refuser d'avoir des enfants ; il ne peut pas en forcer un.
+      if (v.id === s.controlledId && !s.conduct?.children) return false;
       return age >= p.fertileAgeMin && age <= p.fertileAgeMax && v.wealth >= p.birthWealthThreshold;
     });
     let births = 0;
     for (const parent of parents) {
       if (!this.rng.chance(p.birthProbability)) continue;
-      const child = this.createVillager(
-        {
-          disposition: clamp01(parent.disposition + this.rng.normal(0, p.inheritanceNoise)),
-          influence: clamp01(parent.influence + this.rng.normal(0, p.inheritanceNoise)),
-        },
-        parent.id,
-      );
+      const child = this.createVillager(this.inherit(parent), parent.id, parent.home);
       child.isPlayer = parent.isPlayer;
       child.wealth = p.birthEndowment;
       parent.wealth -= p.birthEndowment;
@@ -324,6 +469,8 @@ export class Simulation {
       const income = (v: Villager) => (v.yearSeasons > 0 ? v.yearIncome / v.yearSeasons : undefined);
       const before = new Map(adults.map((v) => [v.id, { d: v.disposition, income: income(v) }]));
       for (const v of adults) {
+        // Le joueur décide lui-même de sa conduite : il n'imite personne, mais on peut l'imiter.
+        if (v.id === this.state.controlledId) continue;
         if (!this.rng.chance(p.imitationProbability)) continue;
         const model = this.rng.pick(adults);
         const m = before.get(model.id);
@@ -345,7 +492,16 @@ export class Simulation {
     return isAdult(v, this.state.params);
   }
 
-  private createVillager({ disposition, influence }: Traits, parentId: number | null): Villager {
+  /** Traits d'un enfant : ceux de son parent, chacun avec une petite variation. */
+  private inherit(parent: Villager): Traits {
+    const p = this.state.params;
+    return {
+      disposition: clamp01(parent.disposition + this.rng.normal(0, p.inheritanceNoise)),
+      influence: clamp01(parent.influence + this.rng.normal(0, p.inheritanceNoise)),
+    };
+  }
+
+  private createVillager({ disposition, influence }: Traits, parentId: number | null, home: number): Villager {
     const p = this.state.params;
     return {
       id: this.state.nextId++,
@@ -364,6 +520,7 @@ export class Simulation {
       yearIncome: 0,
       yearSeasons: 0,
       parentId,
+      home,
       isPlayer: false,
       last: emptyLast(),
     };
@@ -394,6 +551,25 @@ export class Simulation {
       deaths,
     };
   }
+}
+
+/** La valeur choisie par le joueur, ou sa croyance s'il a choisi de faire comme ses voisins. */
+function chosen(value: number | 'neighbors', belief: number): number {
+  return clamp01(value === 'neighbors' ? belief : value);
+}
+
+/**
+ * Rejoue une vie : mêmes graine et réglages, puis chaque choix du journal avant la saison qui suit celle où il a été fait.
+ * Donne exactement la même partie que l'originale (fiche 0002).
+ */
+export function replay(config: SimConfig, journal: JournalEntry[], seasons: number): Simulation {
+  const sim = new Simulation(config);
+  let next = 0;
+  for (let i = 0; i < seasons && !sim.state.extinct; i++) {
+    while (next < journal.length && journal[next]!.season === sim.state.season) sim.act(journal[next++]!.action);
+    sim.step();
+  }
+  return sim;
 }
 
 /** Un villageois est adulte (il travaille, verse au grenier et pêche) à partir de `adultAge`. */
