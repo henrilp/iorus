@@ -60,3 +60,4 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0017](0017-premieres-sources-verifiees.md) | Premières sources vérifiées : les chiffres de l'intro et quatre paramètres | Acceptée |
 | [0018](0018-phaser-4.md) | Phaser 4 plutôt que Phaser 3 | Acceptée |
 | [0019](0019-squelette-du-jeu.md) | Le squelette du jeu : une page à part, l'interface en HTML, le village en Phaser, une saison racontée après coup | Acceptée |
+| [0020](0020-une-vie-puis-l-histoire.md) | Une vie, puis l'histoire : le joueur vit une vie au village, puis regarde ce qu'il en reste | Proposée |
