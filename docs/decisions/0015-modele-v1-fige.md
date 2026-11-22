@@ -1,6 +1,6 @@
 # 0015. Le modèle de la v1 est figé : ce qui reste, ce qui est reporté
 
-- Statut : Acceptée
+- Statut : Acceptée, en partie remplacée par [0028](0028-la-nourriture-se-perd.md) (la nourriture qui se perd)
 - Date : 2026-11-22
 
 ## Contexte

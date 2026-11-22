@@ -166,6 +166,23 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     step: 0.5,
     status: 'hypothese',
   },
+  spoilage: {
+    group: 'economy',
+    label: { fr: 'Nourriture perdue', en: 'Food lost' },
+    help: {
+      fr: 'Part de sa réserve que chacun perd chaque saison, après les repas : grain qui s’abîme, que les bêtes mangent. 0 : rien ne se perd.',
+      en: 'Share of their reserve everyone loses each season, after meals: grain that spoils or that animals eat. 0: nothing is lost.',
+    },
+    unit: FRACTION,
+    min: 0,
+    max: 0.5,
+    step: 0.005,
+    status: 'a-sourcer',
+    note: {
+      fr: '2 % par saison, environ 8 % par an. Les pertes de stockage des céréales dans les greniers traditionnels sont de cet ordre de grandeur (à vérifier). Sans perte, les réserves montaient à plusieurs centaines quand il en faut 40 pour un enfant, et le choix entre enfants et générosité ne se sentait que dans les villages chiches. Au-delà de 3 %, le fait « tragédie des communs » devient fragile ; à 5 %, il casse (fiche 0028).',
+      en: '2% per season, about 8% per year. Storage losses of cereals in traditional granaries are of this order of magnitude (to be checked). Without loss, reserves rose to several hundred when 40 are needed for a child, and the choice between children and generosity was only felt in stingy villages. Above 3%, the “tragedy of the commons” fact becomes fragile; at 5%, it breaks (decision 0028).',
+    },
+  },
   startingWealth: {
     group: 'economy',
     label: { fr: 'Réserve de départ', en: 'Starting reserve' },

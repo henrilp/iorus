@@ -18,6 +18,8 @@ export interface SimParams {
   consumption: number;
   /** Nourriture d'un enfant par saison, prise sur la réserve du parent (ou la sienne s'il est orphelin). */
   childConsumption: number;
+  /** Part de la réserve qui se perd chaque saison, après les repas (fiche 0028). */
+  spoilage: number;
   startingWealth: number;
   /** Âge maximal des villageois au lancement (les âges sont tirés entre l'âge adulte et celui-ci). */
   initialMaxAge: number;
@@ -109,6 +111,7 @@ export const DEFAULT_PARAMS: SimParams = {
   granaryMultiplier: 1.6,
   consumption: 8,
   childConsumption: 3,
+  spoilage: 0.02,
   startingWealth: 20,
   initialMaxAge: 50,
 

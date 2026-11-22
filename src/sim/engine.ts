@@ -377,7 +377,10 @@ export class Simulation {
     return count;
   }
 
-  /** Les adultes mangent sur leur réserve ; les enfants sur celle de leur parent, ou la leur s'ils sont orphelins. */
+  /**
+   * Les adultes mangent sur leur réserve ; les enfants sur celle de leur parent, ou la leur s'ils sont orphelins.
+   * Puis une part de ce qui reste se perd.
+   */
   private eat(): void {
     const s = this.state;
     const p = s.params;
@@ -398,6 +401,8 @@ export class Simulation {
       } else {
         v.hungerSeasons = 0;
       }
+      // Une part de ce qui reste se perd avant la saison suivante (fiche 0028).
+      v.wealth *= 1 - p.spoilage;
     }
   }
 

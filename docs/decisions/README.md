@@ -55,7 +55,7 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0012](0012-mesures-honnetes.md) | Des mesures qui ne trompent pas : revenus et patrimoine, répartition, profils | Acceptée |
 | [0013](0013-outil-de-robustesse.md) | Un outil de robustesse : chaque fait est revérifié quand on fait varier les paramètres | Acceptée |
 | [0014](0014-imitation-du-revenu.md) | L'imitation compare les revenus, pas les réserves | Acceptée |
-| [0015](0015-modele-v1-fige.md) | Le modèle de la v1 est figé : ce qui reste, ce qui est reporté | Acceptée |
+| [0015](0015-modele-v1-fige.md) | Le modèle de la v1 est figé : ce qui reste, ce qui est reporté | Acceptée, en partie remplacée par 0028 |
 | [0016](0016-taille-de-l-etang-au-choix.md) | La taille de l'étang est un réglage du joueur : grand ou petit | Acceptée |
 | [0017](0017-premieres-sources-verifiees.md) | Premières sources vérifiées : les chiffres de l'intro et quatre paramètres | Acceptée |
 | [0018](0018-phaser-4.md) | Phaser 4 plutôt que Phaser 3 | Acceptée |
@@ -68,3 +68,4 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0025](0025-nouveaux-venus-en-option.md) | Des nouveaux venus, en option : tirés comme les villageois de départ, sans choix d'accueil | Acceptée |
 | [0026](0026-le-chef.md) | Le chef, en option : trois chemins tirés au hasard, et des règles qui lui survivent | Acceptée, en partie remplacée par 0027 |
 | [0027](0027-chemins-du-chef-equilibres.md) | Les chemins du chef rééquilibrés : le revenu plutôt que la réserve, et un tirage parmi les trois premiers | Acceptée |
+| [0028](0028-la-nourriture-se-perd.md) | La nourriture se perd : 2 % de la réserve chaque saison | Acceptée |

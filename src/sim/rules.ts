@@ -125,13 +125,13 @@ export const RULES: Rule[] = [
   {
     id: 'meals',
     phase: 'season',
-    title: { fr: '6. Les repas', en: '6. Meals' },
+    title: { fr: '6. Les repas, et ce qui se perd', en: '6. Meals, and what is lost' },
     text: {
-      fr: 'Chaque adulte mange sur sa réserve. Chaque enfant mange sur la réserve de son parent si celui-ci est vivant, adulte et en a les moyens, sinon sur la sienne. Une réserve qui passe sous zéro est ramenée à zéro (pas de dette) et compte comme une saison de faim ; une saison sans faim remet le compteur à zéro.',
-      en: 'Each adult eats from their reserve. Each child eats from their parent’s reserve if the parent is alive, adult and can afford it, otherwise from their own. A reserve falling below zero is reset to zero (no debt) and counts as a hungry season; a season without hunger resets the counter.',
+      fr: 'Chaque adulte mange sur sa réserve. Chaque enfant mange sur la réserve de son parent si celui-ci est vivant, adulte et en a les moyens, sinon sur la sienne. Une réserve qui passe sous zéro est ramenée à zéro (pas de dette) et compte comme une saison de faim ; une saison sans faim remet le compteur à zéro. Ensuite, une petite part de ce qui reste se perd : le grain s’abîme, les bêtes en mangent. Plus la réserve est grosse, plus elle perd.',
+      en: 'Each adult eats from their reserve. Each child eats from their parent’s reserve if the parent is alive, adult and can afford it, otherwise from their own. A reserve falling below zero is reset to zero (no debt) and counts as a hungry season; a season without hunger resets the counter. Then a small share of what remains is lost: grain spoils, animals eat some. The bigger the reserve, the more it loses.',
     },
-    formula: 'adulte : réserve −= [consumption] ; enfant : réserve du parent (ou la sienne) −= [childConsumption]',
-    params: ['consumption', 'childConsumption'],
+    formula: 'adulte : réserve −= [consumption] ; enfant : réserve du parent (ou la sienne) −= [childConsumption] ; puis pour chacun : réserve × (1 − [spoilage])',
+    params: ['consumption', 'childConsumption', 'spoilage'],
   },
   {
     id: 'beliefs',
@@ -231,8 +231,8 @@ export const RULES: Rule[] = [
     phase: 'year',
     title: { fr: 'Les indicateurs', en: 'Indicators' },
     text: {
-      fr: 'Mesurés à la fin de chaque saison, sans effet sur la simulation. Deux mesures d’inégalités par l’indice de Gini (0 : tout le monde pareil ; proche de 1 : une personne a presque tout). Les inégalités de revenu portent sur ce que chaque adulte a gagné dans la saison : elles reflètent les comportements. Les inégalités de patrimoine portent sur les réserves accumulées : elles reflètent surtout l’âge et l’héritage, même dans un village de villageois identiques (Gini d’environ 0,6), car la nourriture ne se perd pas. La répartition des dispositions est mesurée par tranches de 0,1. L’étang est dit épuisé sous un seuil de sa capacité.',
-      en: 'Measured at the end of every season, with no effect on the simulation. Two inequality measures using the Gini index (0: everyone alike; close to 1: one person has almost everything). Income inequality covers what each adult earned during the season: it reflects behaviour. Wealth inequality covers accumulated reserves: it mostly reflects age and inheritance, even in a village of identical villagers (Gini around 0.6), because food never spoils. The distribution of dispositions is measured in bands of 0.1. The pond is called depleted below a threshold of its capacity.',
+      fr: 'Mesurés à la fin de chaque saison, sans effet sur la simulation. Deux mesures d’inégalités par l’indice de Gini (0 : tout le monde pareil ; proche de 1 : une personne a presque tout). Les inégalités de revenu portent sur ce que chaque adulte a gagné dans la saison : elles reflètent les comportements. Les inégalités de patrimoine portent sur les réserves accumulées : elles reflètent surtout l’âge et l’héritage, même dans un village de villageois identiques (Gini d’environ 0,4 avec la perte par défaut, 0,6 sans perte). La répartition des dispositions est mesurée par tranches de 0,1. L’étang est dit épuisé sous un seuil de sa capacité.',
+      en: 'Measured at the end of every season, with no effect on the simulation. Two inequality measures using the Gini index (0: everyone alike; close to 1: one person has almost everything). Income inequality covers what each adult earned during the season: it reflects behaviour. Wealth inequality covers accumulated reserves: it mostly reflects age and inheritance, even in a village of identical villagers (Gini around 0.4 with the default loss, 0.6 without loss). The distribution of dispositions is measured in bands of 0.1. The pond is called depleted below a threshold of its capacity.',
     },
     formula: 'étang épuisé si stock < [pondDepletedThreshold] × capacité',
     params: ['pondDepletedThreshold'],
