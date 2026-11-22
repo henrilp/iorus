@@ -1,6 +1,6 @@
 # 0007. En v1, des sanctions informelles limitées au grenier
 
-- Statut : Acceptée ; en partie remplacée par [0011](0011-sanctions-de-la-surpeche.md) (les sanctions s'étendent à la pêche)
+- Statut : Acceptée ; en partie remplacée par [0011](0011-sanctions-de-la-surpeche.md) (les sanctions s'étendent à la pêche) et par [0021](0021-sanctions-graduees.md) (les sanctions sont graduées)
 - Date : 2026-11-22
 
 ## Contexte

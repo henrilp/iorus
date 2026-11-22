@@ -47,11 +47,11 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0004](0004-comportement-a-un-seul-trait.md) | Un seul trait I/Us, le suivi des autres dosé par la distance au centre | Remplacée par 0005 |
 | [0005](0005-deux-traits-disposition-influencabilite.md) | Deux traits : disposition et influençabilité | Acceptée |
 | [0006](0006-premier-calibrage.md) | Premier calibrage : survivre sans partager est possible, les enfants coûtent, l'étang peut renaître | Acceptée, en partie remplacée par 0010 |
-| [0007](0007-sanctions-limitees-au-grenier.md) | En v1, des sanctions informelles limitées au grenier | Acceptée, en partie remplacée par 0011 |
+| [0007](0007-sanctions-limitees-au-grenier.md) | En v1, des sanctions informelles limitées au grenier | Acceptée, en partie remplacée par 0011 et 0021 |
 | [0008](0008-imitation-de-la-reussite.md) | L'imitation copie la réussite, et seulement la disposition | Acceptée, en partie remplacée par 0014 |
 | [0009](0009-publication-publique-adresse-anonyme.md) | Dépôt public, signé avec l'adresse anonyme GitHub | Acceptée |
 | [0010](0010-peche-de-schaefer.md) | La pêche suit le modèle de Schaefer | Acceptée |
-| [0011](0011-sanctions-de-la-surpeche.md) | Sanctions contre la surpêche, sur le modèle de celles du grenier | Acceptée |
+| [0011](0011-sanctions-de-la-surpeche.md) | Sanctions contre la surpêche, sur le modèle de celles du grenier | Acceptée, en partie remplacée par 0021 |
 | [0012](0012-mesures-honnetes.md) | Des mesures qui ne trompent pas : revenus et patrimoine, répartition, profils | Acceptée |
 | [0013](0013-outil-de-robustesse.md) | Un outil de robustesse : chaque fait est revérifié quand on fait varier les paramètres | Acceptée |
 | [0014](0014-imitation-du-revenu.md) | L'imitation compare les revenus, pas les réserves | Acceptée |
@@ -61,3 +61,4 @@ Ce qui devient plus facile, plus difficile, ce qu'il faudra surveiller.
 | [0018](0018-phaser-4.md) | Phaser 4 plutôt que Phaser 3 | Acceptée |
 | [0019](0019-squelette-du-jeu.md) | Le squelette du jeu : une page à part, l'interface en HTML, le village en Phaser, une saison racontée après coup | Acceptée |
 | [0020](0020-une-vie-puis-l-histoire.md) | Une vie, puis l'histoire : le joueur vit une vie au village, puis regarde ce qu'il en reste | Proposée |
+| [0021](0021-sanctions-graduees.md) | Des sanctions graduées : la peine grandit avec la faute, pas avec la taille du village | Acceptée |

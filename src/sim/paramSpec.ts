@@ -362,8 +362,8 @@ export const PARAM_SPECS: Record<keyof SimParams, ParamSpec> = {
     group: 'sanctions',
     label: { fr: 'Écart toléré', en: 'Tolerated gap' },
     help: {
-      fr: 'On ne peut être sanctionné que si sa coopération est inférieure à la moyenne d’au moins cet écart : sa part versée au grenier, ou sa modération à l’étang (0,1 = 10 points).',
-      en: 'One can only be punished if one’s cooperation is below average by at least this gap: one’s share given to the granary, or one’s restraint at the pond (0.1 = 10 points).',
+      fr: 'On ne peut être sanctionné que si sa coopération est inférieure à la moyenne d’au moins cet écart : sa part versée au grenier, ou sa modération à l’étang (0,1 = 10 points). Il sert aussi à graduer les sanctions : au plus une amende par tranche de cet écart sous la moyenne (à 0, plus aucune limite).',
+      en: 'One can only be punished if one’s cooperation is below average by at least this gap: one’s share given to the granary, or one’s restraint at the pond (0.1 = 10 points). It also grades sanctions: at most one fine per step of this gap below average (at 0, no limit at all).',
     },
     unit: FRACTION,
     min: 0,

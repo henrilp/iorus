@@ -1,6 +1,6 @@
 # 0011. Sanctions contre la surpêche, sur le modèle de celles du grenier
 
-- Statut : Acceptée
+- Statut : Acceptée ; en partie remplacée par [0021](0021-sanctions-graduees.md) (les sanctions sont graduées)
 - Date : 2026-11-22
 - Remplace en partie : [0007](0007-sanctions-limitees-au-grenier.md) (les sanctions limitées au grenier)
 

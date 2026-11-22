@@ -181,24 +181,42 @@ export class Simulation {
   /**
    * Sanctions informelles dans un domaine (grenier ou pêche) : sont ciblés ceux dont la coopération
    * (part versée, ou modération à l'étang) est nettement inférieure à la moyenne.
+   * Les sanctions sont graduées : un fautif reçoit au plus une amende par tranche de `sanctionGap`
+   * sous la moyenne. Sinon tous ceux qui veulent sanctionner tombent sur le même, et l'amende grossit
+   * avec la taille du village au lieu de grandir avec la faute (fiche 0021).
    */
   private sanction(adults: Villager[], cooperation: (v: Villager) => number, mark: (target: Villager) => void): number {
     const p = this.state.params;
     const avg = mean(adults.map(cooperation));
     const targets = adults.filter((v) => cooperation(v) < avg - p.sanctionGap);
     if (targets.length === 0) return 0;
+    // Ceux qui sont prêts à sanctionner cette saison (au plus une sanction chacun).
+    const willing = adults.filter(
+      (punisher) =>
+        punisher.wealth >= p.sanctionCost &&
+        targets.some((t) => t.id !== punisher.id) &&
+        this.rng.chance(sanctionProbability(punisher, p)),
+    );
+    const remaining = new Map(targets.map((t) => [t.id, Math.floor((avg - cooperation(t)) / p.sanctionGap)]));
     let count = 0;
-    for (const punisher of adults) {
-      if (punisher.wealth < p.sanctionCost) continue;
-      const candidates = targets.filter((t) => t.id !== punisher.id);
-      if (candidates.length === 0) continue;
-      if (!this.rng.chance(sanctionProbability(punisher, p))) continue;
-      const target = this.rng.pick(candidates);
-      punisher.wealth -= p.sanctionCost;
-      target.wealth -= p.sanctionFine;
-      punisher.last.sanctionsGiven += 1;
-      mark(target);
-      count += 1;
+    // Tour par tour, pour que les fautifs se partagent les sanctionneurs quand ils sont peu nombreux.
+    let progress = true;
+    while (progress && willing.length > 0) {
+      progress = false;
+      for (const target of targets) {
+        if ((remaining.get(target.id) ?? 0) <= 0) continue;
+        const candidates = willing.filter((w) => w.id !== target.id);
+        if (candidates.length === 0) continue;
+        const punisher = this.rng.pick(candidates);
+        willing.splice(willing.indexOf(punisher), 1);
+        remaining.set(target.id, (remaining.get(target.id) ?? 0) - 1);
+        punisher.wealth -= p.sanctionCost;
+        target.wealth -= p.sanctionFine;
+        punisher.last.sanctionsGiven += 1;
+        mark(target);
+        count += 1;
+        progress = true;
+      }
     }
     return count;
   }

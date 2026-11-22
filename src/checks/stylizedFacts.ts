@@ -120,10 +120,15 @@ export const STYLIZED_FACTS: Check[] = [
   },
   {
     id: 'invasion-contenue',
-    title: 'invasion contenue : avec sanctions, la disposition moyenne tient',
+    title: 'invasion contenue : avec les sanctions du grenier et de la pêche, la disposition moyenne tient',
+    // Avec les seules sanctions du grenier, l'invasion est freinée mais pas contenue depuis que les sanctions
+    // sont graduées (fiche 0021) : l'ancien résultat venait de l'accumulation des amendes sur un même fautif.
     run: (ctx) => {
       const without = ctx.runs({ size: SIZE, composition: FREE_RIDERS }, 200);
-      const withSanctions = ctx.runs({ size: SIZE, composition: FREE_RIDERS, params: { sanctionsEnabled: true } }, 200);
+      const withSanctions = ctx.runs(
+        { size: SIZE, composition: FREE_RIDERS, params: { sanctionsEnabled: true, pondSanctionsEnabled: true } },
+        200,
+      );
       return [
         {
           label: 'disposition moyenne, années 190-200 : avec − sans sanctions',
